@@ -25,63 +25,63 @@
 //
 
 using System;
-using System.Drawing;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using UIKit;
 using mTouchPDFReader.Library.Data.Objects;
 using mTouchPDFReader.Library.Managers;
 
 namespace mTouchPDFReader.Library.Views.Management
 {
 	public class NoteVC : UIViewController
-	{				
+	{
 		#region Data		
 		private DocumentNote _note;
-		private UITextView _txtNote;		
+		private UITextView _txtNote;
 		#endregion
 
 		#region logic
-		public NoteVC(DocumentNote note) : base(null, null) 
+		public NoteVC (DocumentNote note) : base (null, null)
 		{
 			_note = note;
 		}
 
-		public override void ViewDidLoad()
+		public override void ViewDidLoad ()
 		{
-			base.ViewDidLoad();
+			base.ViewDidLoad ();
 
-			var btnApply = new UIBarButtonItem();
-			btnApply.Image = UIImage.FromFile("apply.png");
+			var btnApply = new UIBarButtonItem ();
+			btnApply.Image = UIImage.FromFile ("apply.png");
 			btnApply.Clicked += delegate {
 				_note.Note = _txtNote.Text;
-				MgrAccessor.DocumentNoteMgr.Save(_note);
-				DismissViewController(true, null);
+				MgrAccessor.DocumentNoteMgr.Save (_note);
+				DismissViewController (true, null);
 			};
-			var space = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
-			var btnClose = new UIBarButtonItem();
-			btnClose.Image = UIImage.FromFile("close.png");
-			btnClose.Clicked += delegate { 
-				DismissViewController(true, null);
+			var space = new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace);
+			var btnClose = new UIBarButtonItem ();
+			btnClose.Image = UIImage.FromFile ("close.png");
+			btnClose.Clicked += delegate {
+				DismissViewController (true, null);
 			};
 
-			var toolBarTitle = new UILabel(new RectangleF(0, 0, View.Bounds.Width, 44));
+			var toolBarTitle = new UILabel (new CGRect (0, 0, View.Bounds.Width, 44));
 			toolBarTitle.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			toolBarTitle.BackgroundColor = UIColor.Clear;
 			toolBarTitle.TextColor = UIColor.White;
 			toolBarTitle.TextAlignment = UITextAlignment.Center;
-			toolBarTitle.Text = "Note".t();
+			toolBarTitle.Text = "Note".t ();
 
-			var toolBar = new UIToolbar(new RectangleF(0, 0, View.Bounds.Width, 44));
+			var toolBar = new UIToolbar (new CGRect (0, 0, View.Bounds.Width, 44));
 			toolBar.BarStyle = UIBarStyle.Black;
 			toolBar.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
-			toolBar.SetItems(new [] { btnApply, space, btnClose }, false);
-			toolBar.AddSubview(toolBarTitle);
-			View.AddSubview(toolBar);
-			
-			_txtNote = new UITextView(new RectangleF(0, 44, View.Bounds.Width, View.Bounds.Height));
-			_txtNote.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;	
-			_txtNote.Font = UIFont.SystemFontOfSize(17.0f);
+			toolBar.SetItems (new [] { btnApply, space, btnClose }, false);
+			toolBar.AddSubview (toolBarTitle);
+			View.AddSubview (toolBar);
+
+			_txtNote = new UITextView (new CGRect (0, 44, View.Bounds.Width, View.Bounds.Height));
+			_txtNote.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+			_txtNote.Font = UIFont.SystemFontOfSize (17.0f);
 			_txtNote.Text = _note.Note;
-			View.AddSubview(_txtNote);
+			View.AddSubview (_txtNote);
 		}
 		#endregion
 	}

@@ -25,8 +25,8 @@
 //
 
 using System;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using System.CodeDom.Compiler;
 using mTouchPDFReader.Library.Views.Management;
 

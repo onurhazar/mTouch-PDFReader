@@ -25,8 +25,8 @@
 //
 
 using System;
-using System.Drawing;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using UIKit;
 using mTouchPDFReader.Library.Views.Core;
 using mTouchPDFReader.Library.Managers;
 
@@ -40,57 +40,57 @@ namespace mTouchPDFReader.Library.Views.Management
 		#endregion
 
 		#region GotoPageVC members
-		public GotoPageVC(Action<object> callbackAction) : base(null, null)	
+		public GotoPageVC (Action<object> callbackAction) : base (null, null)
 		{
 			_callbackAction = callbackAction;
 		}
-		
-		public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
 
-			var btnApply = new UIBarButtonItem();
-			btnApply.Image = UIImage.FromFile("apply.png");
-			btnApply.Clicked += delegate { 
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+			var btnApply = new UIBarButtonItem ();
+			btnApply.Image = UIImage.FromFile ("apply.png");
+			btnApply.Clicked += delegate {
 				int pageNumber;
-				int.TryParse(_txtPageNumber.Text, out pageNumber);
+				int.TryParse (_txtPageNumber.Text, out pageNumber);
 				if ((pageNumber <= 0) || (pageNumber > PDFDocument.PageCount)) {
-					using (var alert = new UIAlertView("Error".t(), "Invalid page number".t(), null, "Ok")) {
-						alert.Show();
+					using (var alert = new UIAlertView ("Error".t (), "Invalid page number".t (), null, "Ok")) {
+						alert.Show ();
 					}
 				} else {
-					_callbackAction(pageNumber);
+					_callbackAction (pageNumber);
 				}
-				DismissViewController(true, null);
+				DismissViewController (true, null);
 			};
-			var space = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
-			var btnClose = new UIBarButtonItem();
-			btnClose.Image = UIImage.FromFile("close.png");
-			btnClose.Clicked += delegate { 
-				DismissViewController(true, null);
+			var space = new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace);
+			var btnClose = new UIBarButtonItem ();
+			btnClose.Image = UIImage.FromFile ("close.png");
+			btnClose.Clicked += delegate {
+				DismissViewController (true, null);
 			};
 
-			var toolBarTitle = new UILabel(new RectangleF(0, 0, View.Bounds.Width, 44));
+			var toolBarTitle = new UILabel (new CGRect (0, 0, View.Bounds.Width, 44));
 			toolBarTitle.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			toolBarTitle.BackgroundColor = UIColor.Clear;
 			toolBarTitle.TextColor = UIColor.White;
 			toolBarTitle.TextAlignment = UITextAlignment.Center;
-			toolBarTitle.Text = "Go to page".t();
+			toolBarTitle.Text = "Go to page".t ();
 
-			var toolBar = new UIToolbar(new RectangleF(0, 0, View.Bounds.Width, 44));
+			var toolBar = new UIToolbar (new CGRect (0, 0, View.Bounds.Width, 44));
 			toolBar.BarStyle = UIBarStyle.Black;
 			toolBar.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
-			toolBar.SetItems(new [] { btnApply, space, btnClose }, false);
-			toolBar.AddSubview(toolBarTitle);
-			View.AddSubview(toolBar);
-			
-			_txtPageNumber = new UITextField(new RectangleF(20, 58, View.Bounds.Width - 40, 31));
+			toolBar.SetItems (new [] { btnApply, space, btnClose }, false);
+			toolBar.AddSubview (toolBarTitle);
+			View.AddSubview (toolBar);
+
+			_txtPageNumber = new UITextField (new CGRect (20, 58, View.Bounds.Width - 40, 31));
 			_txtPageNumber.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			_txtPageNumber.BorderStyle = UITextBorderStyle.RoundedRect;
 			_txtPageNumber.KeyboardType = UIKeyboardType.NumberPad;
-			_txtPageNumber.Font = UIFont.SystemFontOfSize(17.0f);
-			_txtPageNumber.Placeholder = "Enter page number".t();
-			View.AddSubview(_txtPageNumber);
+			_txtPageNumber.Font = UIFont.SystemFontOfSize (17.0f);
+			_txtPageNumber.Placeholder = "Enter page number".t ();
+			View.AddSubview (_txtPageNumber);
 		}
 		#endregion
 	}

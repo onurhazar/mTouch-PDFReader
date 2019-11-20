@@ -25,7 +25,7 @@
 //
 
 using System;
-using MonoTouch.UIKit;
+using UIKit;
 using mTouchPDFReader.Library.Data.Enums;
 
 namespace mTouchPDFReader.Library.Data.Objects
@@ -43,14 +43,14 @@ namespace mTouchPDFReader.Library.Data.Objects
 		private const int DefaultZoomScaleLevels = 10;
 		private const bool DefaultAllowZoomByDoubleTouch = true;
 		private const int DefaultThumbsBufferSize = 20;
-		private const int DefaultThumbSize = 125;		
-	
+		private const int DefaultThumbSize = 125;
+
 		public const int MinZoomScaleLevels = 2;
 		public const int MaxZoomScaleLevels = 10;
 		public const int MinThumbSize = 100;
-		public const int MaxThumbSize = 200;	
+		public const int MaxThumbSize = 200;
 		#endregion
-		
+
 		#region Data
 		public UIPageViewControllerTransitionStyle PageTransitionStyle { get; set; }
 		public UIPageViewControllerNavigationOrientation PageNavigationOrientation { get; set; }
@@ -75,7 +75,7 @@ namespace mTouchPDFReader.Library.Data.Objects
 			}
 		}
 		private int _zoomScaleLevels;
-		
+
 		public bool AllowZoomByDoubleTouch { get; set; }
 
 		public int ThumbSize {
@@ -106,11 +106,11 @@ namespace mTouchPDFReader.Library.Data.Objects
 			get {
 				return SystemInfo.Version;
 			}
-		}		
-		#endregion	
-		
+		}
+		#endregion
+
 		#region Logic		
-		public Settings()
+		public Settings ()
 		{
 			PageTransitionStyle = DefaultPageTransitionStyle;
 			PageNavigationOrientation = DefaultPageNavigationOrientation;

@@ -25,20 +25,22 @@
 //
 
 using System;
-using System.Drawing;
+using CoreGraphics;
 using System.Linq;
 using System.Collections.Generic;
-using MonoTouch.CoreGraphics;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using UIKit;
 using mTouchPDFReader.Library.Views.Management;
 using mTouchPDFReader.Library.Managers;
 using mTouchPDFReader.Library.Data.Enums;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
+
 	public class DocumentVC : UIViewController
-	{			
+	{
 		#region Data
+
 		private const float DefaultToolbarHeight = 44.0f;
 		private const float DefaultMargin = 5.0f;
 		private const float SliderLeft = 170.0f;
@@ -58,135 +60,144 @@ namespace mTouchPDFReader.Library.Views.Core
 		private UISlider _slider;
 		private UILabel _pageNumberLabel;
 		private AutoScaleModes _autoScaleMode;
+
 		#endregion
-			
+
 		#region UIViewController members
-		public DocumentVC(int docId, string docName, string docPath) : base(null, null)
+
+		public DocumentVC (int docId, string docName, string docPath) : base (null, null)
 		{
 			_documentId = docId;
 			_documentName = docName;
 			_documentPath = docPath;
 		}
-	
-		public override void ViewDidLoad()
+
+		public override void ViewDidLoad ()
 		{
-			base.ViewDidLoad();
+			base.ViewDidLoad ();
 
-			PDFDocument.OpenDocument(_documentName, _documentPath);
-			
+			PDFDocument.OpenDocument (_documentName, _documentPath);
+
 			Title = _documentName;
-			View.BackgroundColor = UIColor.Gray;
+			View.BackgroundColor = UIColor.Clear;
 			_autoScaleMode = MgrAccessor.SettingsMgr.Settings.AutoScaleMode;
-	
+
 			if (MgrAccessor.SettingsMgr.Settings.TopToolbarVisible) {
-				_topToolbar = createTopToolbar();
-				View.AddSubview(_topToolbar);
-			}
-			
-			if (MgrAccessor.SettingsMgr.Settings.BottomToolbarVisible) {
-				_bottomToolbar = createBottomToolbar();
-				View.AddSubview(_bottomToolbar);
-				updateSliderMaxValue();
+				_topToolbar = createTopToolbar ();
+				_topToolbar.BackgroundColor = UIColor.Clear;
+				View.AddSubview (_topToolbar);
 			}
 
-			_bookPageViewController = new UIPageViewController(
+			if (MgrAccessor.SettingsMgr.Settings.BottomToolbarVisible) {
+				_bottomToolbar = createBottomToolbar ();
+				_bottomToolbar.BackgroundColor = UIColor.Clear;
+				View.AddSubview (_bottomToolbar);
+				updateSliderMaxValue ();
+			}
+
+			_bookPageViewController = new UIPageViewController (
 				MgrAccessor.SettingsMgr.Settings.PageTransitionStyle,
-				MgrAccessor.SettingsMgr.Settings.PageNavigationOrientation, 
-				UIPageViewControllerSpineLocation.Min);		
-			_bookPageViewController.View.Frame = getBookViewFrameRect();
+				MgrAccessor.SettingsMgr.Settings.PageNavigationOrientation,
+				UIPageViewControllerSpineLocation.Min);
+			_bookPageViewController.View.Frame = getBookViewFrameRect ();
 			_bookPageViewController.View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 			_bookPageViewController.View.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
 			_bookPageViewController.GetNextViewController = getNextPageViewController;
 			_bookPageViewController.GetPreviousViewController = getPreviousPageViewController;
 			_bookPageViewController.GetSpineLocation = getSpineLocation;
-			_bookPageViewController.DidFinishAnimating += delegate(object sender, UIPageViewFinishedAnimationEventArgs e) {
-				pageFinishedAnimation(e.Completed, e.Finished, e.PreviousViewControllers);
+			_bookPageViewController.DidFinishAnimating += delegate (object sender, UIPageViewFinishedAnimationEventArgs e) {
+				pageFinishedAnimation (e.Completed, e.Finished, e.PreviousViewControllers);
 			};
-			_bookPageViewController.SetViewControllers(
-				new UIViewController[] { getPageViewController(1) }, 
-				UIPageViewControllerNavigationDirection.Forward, 
+			_bookPageViewController.SetViewControllers (
+				new UIViewController [] { getPageViewController (1) },
+				UIPageViewControllerNavigationDirection.Forward,
 				false,
-				s => execActionsAfterOpenPage());	
+				s => execActionsAfterOpenPage ());
 
-			AddChildViewController(_bookPageViewController);
-			_bookPageViewController.DidMoveToParentViewController(this);
-			View.AddSubview(_bookPageViewController.View);
+			AddChildViewController (_bookPageViewController);
+			_bookPageViewController.DidMoveToParentViewController (this);
+			View.AddSubview (_bookPageViewController.View);
 		}
 
-		public override void ViewDidLayoutSubviews()
+		public override void ViewDidLayoutSubviews ()
 		{
-			base.ViewDidLayoutSubviews();
+			base.ViewDidLayoutSubviews ();
 
-			var actualFrameRect = getRootViewFrameRect();
+			var actualFrameRect = getRootViewFrameRect ();
 			if (_topToolbar != null) {
-				_topToolbar.Frame = new RectangleF(actualFrameRect.Left, actualFrameRect.Top, actualFrameRect.Width, DefaultToolbarHeight);
+				_topToolbar.Frame = new CGRect (actualFrameRect.Left, actualFrameRect.Top, actualFrameRect.Width, DefaultToolbarHeight);
 			}
 			if (_bottomToolbar != null) {
-				_bottomToolbar.Frame = new RectangleF(actualFrameRect.Left, 
-					actualFrameRect.Bottom - DefaultToolbarHeight, 
-					actualFrameRect.Width, 
+				_bottomToolbar.Frame = new CGRect (actualFrameRect.Left,
+					actualFrameRect.Bottom - DefaultToolbarHeight,
+					actualFrameRect.Width,
 					DefaultToolbarHeight);
 			}
-			_bookPageViewController.View.Frame = getBookViewFrameRect();
+			_bookPageViewController.View.Frame = getBookViewFrameRect ();
 
-			foreach (var pageVC in _bookPageViewController.ChildViewControllers.Cast<PageVC>()) {
+			foreach (var pageVC in _bookPageViewController.ChildViewControllers.Cast<PageVC> ()) {
 				pageVC.PageView.NeedUpdateZoomAndOffset = true;
 			}
 		}
 
-		protected override void Dispose(bool disposing)
+		protected override void Dispose (bool disposing)
 		{
-			PDFDocument.CloseDocument();
-			base.Dispose(disposing);
-		}		
-		#endregion
-		
-		#region UIPageViewController	
-		private UIViewController getPreviousPageViewController(UIPageViewController pageController, UIViewController referenceViewController)
-		{			
-			var curPageCntr = referenceViewController as PageVC;
-			if (curPageCntr.PageNumber == 0) {
-				return null;				
-			} 
-			int pageNumber = curPageCntr.PageNumber - 1;
-
-			return getPageViewController(pageNumber);
+			PDFDocument.CloseDocument ();
+			base.Dispose (disposing);
 		}
 
-		private UIViewController getNextPageViewController(UIPageViewController pageController, UIViewController referenceViewController)
-		{			
+		#endregion
+
+		#region UIPageViewController
+
+		private UIViewController getPreviousPageViewController (UIPageViewController pageController, UIViewController referenceViewController)
+		{
 			var curPageCntr = referenceViewController as PageVC;
-			if (curPageCntr.PageNumber == (PDFDocument.PageCount)) {				
+			if (curPageCntr.PageNumber == 0) {
+				return null;
+			}
+			int pageNumber = curPageCntr.PageNumber - 1;
+
+			return getPageViewController (pageNumber);
+		}
+
+		private UIViewController getNextPageViewController (UIPageViewController pageController, UIViewController referenceViewController)
+		{
+			var curPageCntr = referenceViewController as PageVC;
+			if (curPageCntr.PageNumber == (PDFDocument.PageCount)) {
 				return _bookPageViewController.SpineLocation == UIPageViewControllerSpineLocation.Mid
-					? getEmptyPageContentVC()
-					: null;	
-			} else if (curPageCntr.PageNumber == -1) { 
+					? getEmptyPageContentVC ()
+					: null;
+			} else if (curPageCntr.PageNumber == -1) {
 				return null;
 			}
 			int pageNumber = curPageCntr.PageNumber + 1;
 
-			return getPageViewController(pageNumber);
-		}	
+			return getPageViewController (pageNumber);
+		}
 
-		private UIPageViewControllerSpineLocation getSpineLocation(UIPageViewController pageViewController, UIInterfaceOrientation orientation)
+		private UIPageViewControllerSpineLocation getSpineLocation (UIPageViewController pageViewController, UIInterfaceOrientation orientation)
 		{
-			var currentPageVC = getCurrentPageContentVC();
+			var currentPageVC = getCurrentPageContentVC ();
 			pageViewController.DoubleSided = false;
-			pageViewController.SetViewControllers(new UIViewController[] { currentPageVC }, UIPageViewControllerNavigationDirection.Forward, true, s => { });
+			pageViewController.SetViewControllers (new UIViewController [] { currentPageVC }, UIPageViewControllerNavigationDirection.Forward, true, s => {
+			});
 
 			return UIPageViewControllerSpineLocation.Min;
 		}
 
-		private void pageFinishedAnimation(bool completed, bool finished, UIViewController[] previousViewControllers)
+		private void pageFinishedAnimation (bool completed, bool finished, UIViewController [] previousViewControllers)
 		{
 			if (completed) {
-				execActionsAfterOpenPage();
+				execActionsAfterOpenPage ();
 			}
 		}
+
 		#endregion
-				
+
 		#region UI Logic
-		private RectangleF getRootViewFrameRect()
+
+		private CGRect getRootViewFrameRect ()
 		{
 			var rect = View.Bounds;
 
@@ -200,146 +211,152 @@ namespace mTouchPDFReader.Library.Views.Core
 
 			return rect;
 		}
-		
-		private UIInterfaceOrientation getDeviceOrientation()
+
+		private UIInterfaceOrientation getDeviceOrientation ()
 		{
 			switch (UIDevice.CurrentDevice.Orientation) {
-				case UIDeviceOrientation.LandscapeLeft:
-					return UIInterfaceOrientation.LandscapeLeft;
-				case UIDeviceOrientation.LandscapeRight:
-					return UIInterfaceOrientation.LandscapeRight;
-				case UIDeviceOrientation.Portrait:
-					return UIInterfaceOrientation.Portrait;
-				case UIDeviceOrientation.PortraitUpsideDown:
-					return UIInterfaceOrientation.PortraitUpsideDown;
+			case UIDeviceOrientation.LandscapeLeft:
+				return UIInterfaceOrientation.LandscapeLeft;
+			case UIDeviceOrientation.LandscapeRight:
+				return UIInterfaceOrientation.LandscapeRight;
+			case UIDeviceOrientation.Portrait:
+				return UIInterfaceOrientation.Portrait;
+			case UIDeviceOrientation.PortraitUpsideDown:
+				return UIInterfaceOrientation.PortraitUpsideDown;
 			}
 			return UIInterfaceOrientation.Portrait;
 		}
-		
-		private void updateSliderMaxValue()
+
+		private void updateSliderMaxValue ()
 		{
 			if (_slider != null) {
 				_slider.MaxValue = PDFDocument.PageCount;
 			}
 		}
 
-		protected virtual UIView createTopToolbar()
+		protected virtual UIView createTopToolbar ()
 		{
-			var toolBarFrame = getRootViewFrameRect();
+			var toolBarFrame = getRootViewFrameRect ();
 			toolBarFrame.Height = DefaultToolbarHeight;
 
-			var toolBar = new UIToolbar(toolBarFrame);
+			var toolBar = new UIToolbar (toolBarFrame);
+			toolBar.SetBackgroundImage (new UIImage (), UIToolbarPosition.Any, UIBarMetrics.Default);
+			toolBar.SetShadowImage (new UIImage (), UIToolbarPosition.Any);
 			toolBar.AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleWidth;
 
-			createToolbarButton(toolBar, DocumentActionTypes.ZoomOut, "zoomOut.png", zoomOut);
-			createToolbarButton(toolBar, DocumentActionTypes.ZoomIn, "zoomIn.png", zoomIn);
-			createToolbarSeparator(toolBar);
+			createToolbarButton (toolBar, DocumentActionTypes.ZoomOut, "zoomOut.png", zoomOut);
+			createToolbarButton (toolBar, DocumentActionTypes.ZoomIn, "zoomIn.png", zoomIn);
+			createToolbarSeparator (toolBar);
 
-			createToolbarButton(toolBar, DocumentActionTypes.Note, "note.png", () => {
-				var note = MgrAccessor.DocumentNoteMgr.Load(_documentId);
-				var vc = new NoteVC(note);
-				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-				PresentViewController(vc, true, null);
-			});
-			createToolbarButton(toolBar, DocumentActionTypes.Bookmarks, "bookmarksList.png", () => {
-				var bookmarks = MgrAccessor.DocumentBookmarkMgr.GetAllForDocument(_documentId);
-				var vc = new BookmarksVC(_documentId, bookmarks, PDFDocument.CurrentPageNumber, p => OpenDocumentPage((int)p));
-				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-				PresentViewController(vc, true, null);
-			});
-			createToolbarButton(toolBar, DocumentActionTypes.Thumbs, "thumbs.png", () => {
-				var vc = new ThumbsVC(p => OpenDocumentPage((int)p));
-				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-				PresentViewController(vc, true, null);
-			});
-			createToolbarSeparator(toolBar);
+			//			createToolbarButton(toolBar, DocumentActionTypes.Note, "note.png", () => {
+			//				var note = MgrAccessor.DocumentNoteMgr.Load(_documentId);
+			//				var vc = new NoteVC(note);
+			//				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+			//				PresentViewController(vc, true, null);
+			//			});
+			//			createToolbarButton(toolBar, DocumentActionTypes.Bookmarks, "bookmarksList.png", () => {
+			//				var bookmarks = MgrAccessor.DocumentBookmarkMgr.GetAllForDocument(_documentId);
+			//				var vc = new BookmarksVC(_documentId, bookmarks, PDFDocument.CurrentPageNumber, p => OpenDocumentPage((int)p));
+			//				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+			//				PresentViewController(vc, true, null);
+			//			});
+			//			createToolbarButton(toolBar, DocumentActionTypes.Thumbs, "thumbs.png", () => {
+			//				var vc = new ThumbsVC(p => OpenDocumentPage((int)p));
+			//				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+			//				PresentViewController(vc, true, null);
+			//			});
+			createToolbarSeparator (toolBar);
 
-			_btnAutoWidth = createToolbarButton(toolBar, DocumentActionTypes.AutoWidth, getImagePathForButton(DocumentActionTypes.AutoWidth), setAutoWidth);
-			_btnAutoHeight = createToolbarButton(toolBar, DocumentActionTypes.AutoHeight, getImagePathForButton(DocumentActionTypes.AutoHeight), setAutoHeight);
-			createToolbarSeparator(toolBar);
+			_btnAutoWidth = createToolbarButton (toolBar, DocumentActionTypes.AutoWidth, getImagePathForButton (DocumentActionTypes.AutoWidth), setAutoWidth);
+			_btnAutoHeight = createToolbarButton (toolBar, DocumentActionTypes.AutoHeight, getImagePathForButton (DocumentActionTypes.AutoHeight), setAutoHeight);
+			createToolbarSeparator (toolBar);
 
 			return toolBar;
 		}
 
-		protected virtual UIView createBottomToolbar()
+		protected virtual UIView createBottomToolbar ()
 		{
-			var bottomBarFrame = getRootViewFrameRect();
+			var bottomBarFrame = getRootViewFrameRect ();
 			bottomBarFrame.Y += bottomBarFrame.Height - DefaultToolbarHeight;
 			bottomBarFrame.Height = DefaultToolbarHeight;
 
-			var bottomBar = new UIToolbar(bottomBarFrame);
+			var bottomBar = new UIToolbar (bottomBarFrame);
+			bottomBar.SetBackgroundImage (new UIImage (), UIToolbarPosition.Any, UIBarMetrics.Default);
+			bottomBar.SetShadowImage (new UIImage (), UIToolbarPosition.Any);
 			bottomBar.AutoresizingMask = UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleWidth;
 
-			createToolbarButton(bottomBar, DocumentActionTypes.NavigateToFirstPage, "navigateToFirst.png", openFirstPage);
-			createToolbarButton(bottomBar, DocumentActionTypes.NavigateToPriorPage, "navigateToPrior.png", openPriorPage);
-			createToolbarButton(bottomBar, DocumentActionTypes.NavigateToPage, "navigateToPage.png", () => {
-				var vc = new GotoPageVC(p => OpenDocumentPage((int)p));
+			createToolbarButton (bottomBar, DocumentActionTypes.NavigateToFirstPage, "navigateToFirst.png", openFirstPage);
+			createToolbarButton (bottomBar, DocumentActionTypes.NavigateToPriorPage, "navigateToPrior.png", openPriorPage);
+			createToolbarButton (bottomBar, DocumentActionTypes.NavigateToPage, "navigateToPage.png", () => {
+				var vc = new GotoPageVC (p => OpenDocumentPage ((int)p));
 				vc.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-				PresentViewController(vc, true, null);
+				PresentViewController (vc, true, null);
 			});
-			createToolbarButton(bottomBar, DocumentActionTypes.NavigateToNextPage, "navigateToNext.png", openNextPage);
-			createToolbarButton(bottomBar, DocumentActionTypes.NavigateToLastPage, "navigateToLast.png", openLastPage);
-			createToolbarSeparator(bottomBar);
+			createToolbarButton (bottomBar, DocumentActionTypes.NavigateToNextPage, "navigateToNext.png", openNextPage);
+			createToolbarButton (bottomBar, DocumentActionTypes.NavigateToLastPage, "navigateToLast.png", openLastPage);
+			createToolbarSeparator (bottomBar);
 
 			var pageNumberLeft = bottomBarFrame.Width - PageNumberWidth - DefaultMargin;
-			var pageNumberLabelFrame = new RectangleF(pageNumberLeft, (bottomBarFrame.Height - PageNumberHeight) / 2, PageNumberWidth, PageNumberHeight);
-			_pageNumberLabel = new UILabel(pageNumberLabelFrame);
+			var pageNumberLabelFrame = new CGRect (pageNumberLeft, (bottomBarFrame.Height - PageNumberHeight) / 2, PageNumberWidth, PageNumberHeight);
+			_pageNumberLabel = new UILabel (pageNumberLabelFrame);
 			_pageNumberLabel.AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin;
-			_pageNumberLabel.Font = UIFont.SystemFontOfSize(12.0f);
+			_pageNumberLabel.Font = UIFont.SystemFontOfSize (12.0f);
 			_pageNumberLabel.TextAlignment = UITextAlignment.Center;
 			_pageNumberLabel.TextColor = UIColor.Gray;
-			bottomBar.AddSubview(_pageNumberLabel);
+			bottomBar.AddSubview (_pageNumberLabel);
 
 			var sliderWidth = pageNumberLeft - SliderLeft - DefaultMargin;
-			var sliderFrame = new RectangleF(SliderLeft, (bottomBarFrame.Height - SliderHeight) / 2, sliderWidth, SliderHeight);
-			_slider = new UISlider(sliderFrame);
+			var sliderFrame = new CGRect (SliderLeft, (bottomBarFrame.Height - SliderHeight) / 2, sliderWidth, SliderHeight);
+			_slider = new UISlider (sliderFrame);
 			_slider.MinValue = 1;
 			_slider.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			_slider.ValueChanged += delegate {
 				if (_pageNumberLabel != null) {
-					_pageNumberLabel.Text = string.Format(@"{0}/{1}", (int)_slider.Value, PDFDocument.PageCount);
+					_pageNumberLabel.Text = string.Format (@"{0}/{1}", (int)_slider.Value, PDFDocument.PageCount);
 				}
 			};
-			_slider.TouchUpInside += delegate(object sender, EventArgs e) {
-				OpenDocumentPage((int)_slider.Value);
+			_slider.TouchUpInside += delegate (object sender, EventArgs e) {
+				OpenDocumentPage ((int)_slider.Value);
 			};
-			bottomBar.AddSubview(_slider);
-			
+			bottomBar.AddSubview (_slider);
+
 			return bottomBar;
 		}
 
-		private void addButtonToToolbarBar(UIToolbar toolbar, UIBarButtonItem item)
+		private void addButtonToToolbarBar (UIToolbar toolbar, UIBarButtonItem item)
 		{
-			var items = toolbar.Items ?? new UIBarButtonItem[0];
-			var itemsList = items.ToList();
-			itemsList.Add(item);
-			toolbar.SetItems(itemsList.ToArray(), false);
+			var items = toolbar.Items ?? new UIBarButtonItem [0];
+			var itemsList = items.ToList ();
+			itemsList.Add (item);
+			toolbar.SetItems (itemsList.ToArray (), false);
 		}
 
-		private void createToolbarSeparator(UIToolbar toolbar)
+		private void createToolbarSeparator (UIToolbar toolbar)
 		{
-			var item = new UIBarButtonItem(UIBarButtonSystemItem.FixedSpace);
-			addButtonToToolbarBar(toolbar, item);
+			var item = new UIBarButtonItem (UIBarButtonSystemItem.FixedSpace);
+			addButtonToToolbarBar (toolbar, item);
 		}
 
-		private UIBarButtonItem createToolbarButton(UIToolbar toolbar, DocumentActionTypes actionType, string imagePath, Action action)
+		private UIBarButtonItem createToolbarButton (UIToolbar toolbar, DocumentActionTypes actionType, string imagePath, Action action)
 		{
-			var btn = new UIBarButtonItem();
-			btn.Image = UIImage.FromFile(imagePath);
-			btn.Clicked += delegate { 
-				action();
+			var btn = new UIBarButtonItem ();
+			btn.Image = UIImage.FromFile (imagePath);
+			btn.Clicked += delegate {
+				action ();
 			};
 
-			addButtonToToolbarBar(toolbar, btn);
+			addButtonToToolbarBar (toolbar, btn);
 
 			return btn;
 		}
+
 		#endregion
 
 		#region PDFDocument logic
-		private RectangleF getBookViewFrameRect()
+
+		private CGRect getBookViewFrameRect ()
 		{
-			var rect = getRootViewFrameRect();
+			var rect = getRootViewFrameRect ();
 
 			if (_topToolbar != null) {
 				rect.Y = _topToolbar.Frame.Bottom;
@@ -351,155 +368,160 @@ namespace mTouchPDFReader.Library.Views.Core
 
 			return rect;
 		}
-		
-		private RectangleF getPageViewFrameRect()
+
+		private CGRect getPageViewFrameRect ()
 		{
-			return _bookPageViewController.View.Bounds; 
+			return _bookPageViewController.View.Bounds;
 		}
 
-		private void updatePageViewAutoScaleMode()
+		private void updatePageViewAutoScaleMode ()
 		{
 			var pageVCs = _bookPageViewController.ViewControllers
-				.Cast<PageVC>()
-				.Where(x => x != null && x.IsNotEmptyPage);
+				.Cast<PageVC> ()
+				.Where (x => x != null && x.IsNotEmptyPage);
 
 			foreach (var pageVC in pageVCs) {
 				pageVC.PageView.NeedUpdateZoomAndOffset = true;
 				pageVC.PageView.AutoScaleMode = _autoScaleMode;
-				pageVC.PageView.SetNeedsLayout();
+				pageVC.PageView.SetNeedsLayout ();
 			}
 		}
 
-		private PageVC getCurrentPageContentVC()
+		private PageVC getCurrentPageContentVC ()
 		{
-			return (PageVC)_bookPageViewController.ViewControllers[0];
+			return (PageVC)_bookPageViewController.ViewControllers [0];
 		}
 
-		private PageVC getEmptyPageContentVC()
+		private PageVC getEmptyPageContentVC ()
 		{
-			return new PageVC(getPageViewFrameRect(), _autoScaleMode, -1);
+			return new PageVC (getPageViewFrameRect (), _autoScaleMode, -1);
 		}
 
-		private PageVC getPageViewController(int pageNumber)
+		private PageVC getPageViewController (int pageNumber)
 		{
 			if (!PDFDocument.DocumentHasLoaded || pageNumber < 1 || pageNumber > PDFDocument.PageCount || pageNumber == PDFDocument.CurrentPageNumber) {
 				return null;
 			}
-			return new PageVC(getPageViewFrameRect(), _autoScaleMode, pageNumber);
+			return new PageVC (getPageViewFrameRect (), _autoScaleMode, pageNumber);
 		}
 
-		private int getPageIncValue()
+		private int getPageIncValue ()
 		{
 			return _bookPageViewController.SpineLocation == UIPageViewControllerSpineLocation.Mid ? 2 : 1;
 		}
 
-		private string getImagePathForButton(DocumentActionTypes actionType)
+		private string getImagePathForButton (DocumentActionTypes actionType)
 		{
 			var ret = "";
 			if (actionType == DocumentActionTypes.AutoWidth) {
-				ret = _autoScaleMode == AutoScaleModes.AutoWidth 
-					? "autoWidth_Selected.png" 
+				ret = _autoScaleMode == AutoScaleModes.AutoWidth
+					? "autoWidth_Selected.png"
 					: "autoWidth.png";
 			} else if (actionType == DocumentActionTypes.AutoHeight) {
-				ret = _autoScaleMode == AutoScaleModes.AutoHeight 
-					? "autoHeight_Selected.png" 
+				ret = _autoScaleMode == AutoScaleModes.AutoHeight
+					? "autoHeight_Selected.png"
 					: "autoHeight.png";
 			}
-		
+
 			return ret;
 		}
 
-		public virtual void OpenDocumentPage(int pageNumber)
+		public virtual void OpenDocumentPage (int pageNumber)
 		{
 			if (pageNumber < 1 || pageNumber > PDFDocument.PageCount) {
 				return;
 			}
 
-			var navDirection = pageNumber < PDFDocument.CurrentPageNumber  
+			var navDirection = pageNumber < PDFDocument.CurrentPageNumber
 				? UIPageViewControllerNavigationDirection.Reverse
 				: UIPageViewControllerNavigationDirection.Forward;
 
-			var pageVC = getPageViewController(pageNumber);
+			var pageVC = getPageViewController (pageNumber);
 			if (pageVC == null) {
 				return;
 			}
 
-			_bookPageViewController.SetViewControllers(
-				new UIViewController[] { pageVC }, 
-				navDirection, 
-				true, 
-				s => { execActionsAfterOpenPage(); });
-		}		
+			_bookPageViewController.SetViewControllers (
+				new UIViewController [] { pageVC },
+				navDirection,
+				true,
+				s => {
+					execActionsAfterOpenPage ();
+				});
+		}
 
-		private void execActionsAfterOpenPage()
+		private void execActionsAfterOpenPage ()
 		{
-			PDFDocument.CurrentPageNumber = getCurrentPageContentVC().PageNumber;	
-			
+			PDFDocument.CurrentPageNumber = getCurrentPageContentVC ().PageNumber;
+
 			if (_pageNumberLabel != null) {
-				_pageNumberLabel.Text = string.Format(@"{0}/{1}", PDFDocument.CurrentPageNumber, PDFDocument.PageCount);
+				_pageNumberLabel.Text = string.Format (@"{0}/{1}", PDFDocument.CurrentPageNumber, PDFDocument.PageCount);
 			}
-			
+
 			if (_slider != null) {
 				_slider.Value = PDFDocument.CurrentPageNumber;
 			}
 		}
+
 		#endregion
-		
-		#region Events			
-		protected virtual void openFirstPage()
+
+		#region Events
+
+		protected virtual void openFirstPage ()
 		{
-			OpenDocumentPage(1);
+			OpenDocumentPage (1);
 		}
-		
-		protected virtual void openPriorPage()
+
+		protected virtual void openPriorPage ()
 		{
-			OpenDocumentPage(PDFDocument.CurrentPageNumber - getPageIncValue());
+			OpenDocumentPage (PDFDocument.CurrentPageNumber - getPageIncValue ());
 		}
-		
-		protected virtual void openNextPage()
+
+		protected virtual void openNextPage ()
 		{
-			OpenDocumentPage(PDFDocument.CurrentPageNumber + getPageIncValue());
+			OpenDocumentPage (PDFDocument.CurrentPageNumber + getPageIncValue ());
 		}
-		
-		protected virtual void openLastPage()
+
+		protected virtual void openLastPage ()
 		{
-			OpenDocumentPage(PDFDocument.PageCount);
+			OpenDocumentPage (PDFDocument.PageCount);
 		}
-		
-		protected virtual void zoomOut()
+
+		protected virtual void zoomOut ()
 		{
-			var pageVC = getCurrentPageContentVC();
+			var pageVC = getCurrentPageContentVC ();
 			if (PDFDocument.DocumentHasLoaded && pageVC.IsNotEmptyPage) {
-				pageVC.PageView.ZoomDecrement();
-			}
-		}
-		
-		protected virtual void zoomIn()
-		{
-			var pageVC = getCurrentPageContentVC();
-			if (PDFDocument.DocumentHasLoaded && pageVC.IsNotEmptyPage) {
-				pageVC.PageView.ZoomIncrement();
+				pageVC.PageView.ZoomDecrement ();
 			}
 		}
 
-		protected virtual void setAutoScaleMode(AutoScaleModes autoScaleMode)
+		protected virtual void zoomIn ()
+		{
+			var pageVC = getCurrentPageContentVC ();
+			if (PDFDocument.DocumentHasLoaded && pageVC.IsNotEmptyPage) {
+				pageVC.PageView.ZoomIncrement ();
+			}
+		}
+
+		protected virtual void setAutoScaleMode (AutoScaleModes autoScaleMode)
 		{
 			_autoScaleMode = autoScaleMode;
-			_btnAutoWidth.Image = UIImage.FromFile(getImagePathForButton(DocumentActionTypes.AutoWidth));
-			_btnAutoHeight.Image = UIImage.FromFile(getImagePathForButton(DocumentActionTypes.AutoHeight));
+			_btnAutoWidth.Image = UIImage.FromFile (getImagePathForButton (DocumentActionTypes.AutoWidth));
+			_btnAutoHeight.Image = UIImage.FromFile (getImagePathForButton (DocumentActionTypes.AutoHeight));
 
-			updatePageViewAutoScaleMode();
+			updatePageViewAutoScaleMode ();
 		}
 
-		protected virtual void setAutoWidth()
+		protected virtual void setAutoWidth ()
 		{
-			setAutoScaleMode(AutoScaleModes.AutoWidth);
+			setAutoScaleMode (AutoScaleModes.AutoWidth);
 		}
 
-		protected virtual void setAutoHeight()
+		protected virtual void setAutoHeight ()
 		{
-			setAutoScaleMode(AutoScaleModes.AutoHeight);
+			setAutoScaleMode (AutoScaleModes.AutoHeight);
 		}
+
 		#endregion
 	}
 }

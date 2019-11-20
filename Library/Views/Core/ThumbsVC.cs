@@ -26,15 +26,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using UIKit;
 using mTouchPDFReader.Library.Managers;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
+
 	public class ThumbsVC : UIViewController
-	{		
-		#region Data			
+	{
+		#region Data
+
 		private const int ThumbMargin = 5;
 		private const int ThumbCols = 3;
 
@@ -45,86 +47,92 @@ namespace mTouchPDFReader.Library.Views.Core
 		private class ThumbsPageInfo
 		{
 			public int ThumbSize { get; set; }
+
 			public int ThumbRows { get; set; }
+
 			public int ThumbsCountPerPage {
 				get {
 					return ThumbCols * ThumbRows;
 				}
 			}
 		}
+
 		#endregion
-			
-		#region UIViewController members		
-		public ThumbsVC(Action<object> callbackAction) : base(null, null)
-		{
-			_openPageCallback = callbackAction; 
-		}				
 
-		public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
+		#region UIViewController members
 
-			var space = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
-			var btnClose = new UIBarButtonItem();
-			btnClose.Image = UIImage.FromFile("close.png");
-			btnClose.Clicked += delegate { 
-				DismissViewController(true, null);
+		public ThumbsVC (Action<object> callbackAction) : base (null, null)
+		{
+			_openPageCallback = callbackAction;
+		}
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+			var space = new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace);
+			var btnClose = new UIBarButtonItem ();
+			btnClose.Image = UIImage.FromFile ("close.png");
+			btnClose.Clicked += delegate {
+				DismissViewController (true, null);
 			};
 
-			var toolBarTitle = new UILabel(new RectangleF(0, 0, View.Bounds.Width, 44));
+			var toolBarTitle = new UILabel (new CGRect (0, 0, View.Bounds.Width, 44));
 			toolBarTitle.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			toolBarTitle.BackgroundColor = UIColor.Clear;
 			toolBarTitle.TextColor = UIColor.White;
 			toolBarTitle.TextAlignment = UITextAlignment.Center;
-			toolBarTitle.Text = "Thumbs".t();
+			toolBarTitle.Text = "Thumbs".t ();
 
-			var toolBar = new UIToolbar(new RectangleF(0, 0, View.Bounds.Width, 44));
+			var toolBar = new UIToolbar (new CGRect (0, 0, View.Bounds.Width, 44));
 			toolBar.BarStyle = UIBarStyle.Black;
 			toolBar.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
-			toolBar.SetItems(new [] { space, btnClose }, false);
-			toolBar.AddSubview(toolBarTitle);
-			View.AddSubview(toolBar);
+			toolBar.SetItems (new [] { space, btnClose }, false);
+			toolBar.AddSubview (toolBarTitle);
+			View.AddSubview (toolBar);
 
-			_thumbsViewContainer = new UIView(new RectangleF(0, 44, View.Bounds.Width, View.Bounds.Height - 85)); 
-			_thumbsViewContainer.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight; 
+			_thumbsViewContainer = new UIView (new CGRect (0, 44, View.Bounds.Width, View.Bounds.Height - 85));
+			_thumbsViewContainer.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 			_thumbsViewContainer.BackgroundColor = UIColor.Gray;
-			View.AddSubview(_thumbsViewContainer);
+			View.AddSubview (_thumbsViewContainer);
 
-			_thumbsPageControl = new UIPageControl(new RectangleF(0, View.Bounds.Height - 30, View.Bounds.Width, 20));
+			_thumbsPageControl = new UIPageControl (new CGRect (0, View.Bounds.Height - 30, View.Bounds.Width, 20));
 			_thumbsPageControl.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin;
 			_thumbsPageControl.ValueChanged += delegate {
-				createThumbsPage(_thumbsPageControl.CurrentPage);
+				createThumbsPage ((int)_thumbsPageControl.CurrentPage);
 			};
-			View.AddSubview(_thumbsPageControl);
+			View.AddSubview (_thumbsPageControl);
 		}
 
-		public override void ViewWillLayoutSubviews()
+		public override void ViewWillLayoutSubviews ()
 		{
-			base.ViewWillLayoutSubviews();
+			base.ViewWillLayoutSubviews ();
 
-			createThumbsPage(0);
-			var thumbsPageInfo = getThumbsPageInfo();
-			_thumbsPageControl.Pages = (int)Math.Ceiling(PDFDocument.PageCount / (float)thumbsPageInfo.ThumbsCountPerPage);
+			createThumbsPage (0);
+			var thumbsPageInfo = getThumbsPageInfo ();
+			_thumbsPageControl.Pages = (int)Math.Ceiling (PDFDocument.PageCount / (float)thumbsPageInfo.ThumbsCountPerPage);
 		}
+
 		#endregion
-				
-		#region Logic
-		private void createThumbsPage(int thumbsPageNumber)
-		{
-			var thumbsPageInfo = getThumbsPageInfo();
 
-			var thumbViews = new List<UIView>();
+		#region Logic
+
+		private void createThumbsPage (int thumbsPageNumber)
+		{
+			var thumbsPageInfo = getThumbsPageInfo ();
+
+			var thumbViews = new List<UIView> ();
 			var pageNumber = ThumbCols * thumbsPageInfo.ThumbRows * thumbsPageNumber + 1;
 			var top = ThumbMargin;
 			for (var r = 0; r < thumbsPageInfo.ThumbRows; r++) {
 				var left = ThumbMargin;
 				for (var c = 0; c < ThumbCols; c++) {
-					var thumbRect = new RectangleF(left, top, thumbsPageInfo.ThumbSize, thumbsPageInfo.ThumbSize);
-					var thumbView = new ThumbWithPageNumberView(thumbRect, pageNumber, thumbSelected);
+					var thumbRect = new CGRect (left, top, thumbsPageInfo.ThumbSize, thumbsPageInfo.ThumbSize);
+					var thumbView = new ThumbWithPageNumberView (thumbRect, pageNumber, thumbSelected);
 					if (pageNumber == PDFDocument.CurrentPageNumber) {
-						thumbView.SetAsSelected();
+						thumbView.SetAsSelected ();
 					}
-					thumbViews.Add(thumbView);
+					thumbViews.Add (thumbView);
 
 					left += thumbsPageInfo.ThumbSize + ThumbMargin;
 					pageNumber++;
@@ -137,29 +145,30 @@ namespace mTouchPDFReader.Library.Views.Core
 					break;
 				}
 			}
-				
+
 			foreach (var view in _thumbsViewContainer.Subviews) {
-				view.RemoveFromSuperview();
+				view.RemoveFromSuperview ();
 			}
-			_thumbsViewContainer.AddSubviews(thumbViews.ToArray());
+			_thumbsViewContainer.AddSubviews (thumbViews.ToArray ());
 		}
 
-		private ThumbsPageInfo getThumbsPageInfo()
+		private ThumbsPageInfo getThumbsPageInfo ()
 		{
-			var ret = new ThumbsPageInfo();
+			var ret = new ThumbsPageInfo ();
 			ret.ThumbSize = (int)((_thumbsViewContainer.Bounds.Width - ThumbMargin) / ThumbCols) - ThumbMargin;
 			ret.ThumbRows = (int)((_thumbsViewContainer.Bounds.Height - ThumbMargin) / ret.ThumbSize);
 
 			return ret;
 		}
 
-		private void thumbSelected(ThumbWithPageNumberView thumbView)
+		private void thumbSelected (ThumbWithPageNumberView thumbView)
 		{
-			thumbView.SetAsSelected();
-			_openPageCallback(thumbView.PageNumber);
+			thumbView.SetAsSelected ();
+			_openPageCallback (thumbView.PageNumber);
 
-			DismissViewController(true, null);
-		}		
+			DismissViewController (true, null);
+		}
+
 		#endregion
 	}
 }

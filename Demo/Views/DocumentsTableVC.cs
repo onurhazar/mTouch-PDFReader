@@ -26,8 +26,8 @@
 
 using System;
 using System.IO;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using System.CodeDom.Compiler;
 using mTouchPDFReader.Demo.Data;
 using mTouchPDFReader.Library.Views.Core;
@@ -73,7 +73,7 @@ namespace mTouchPDFReader.Demo
 				_vc.NavigationController.PushViewController(docViewController, true);
 			}
 
-			public override int RowsInSection(UITableView tableview, int section)
+			public override nint RowsInSection (UITableView tableview, nint section)
 			{
 				return PDFDocumentFile.PDFFiles.Count;
 			}

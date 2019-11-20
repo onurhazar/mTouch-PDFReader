@@ -3,3 +3,11 @@ obj
 .DS_STORE
 *.userprefs
 version.txt
+.vs/mTouchPDFReader/xs/project-cache/mTouchPDFReaderDemo-Debug|iPhone.json
+.vs/mTouchPDFReader/xs/project-cache/mTouchPDFReaderDemo-Release|iPhone.json
+.vs/mTouchPDFReader/xs/project-cache/mTouchPDFReaderLibrary-Debug.json
+.vs/mTouchPDFReader/xs/project-cache/mTouchPDFReaderLibrary-Release.json
+.vs/mTouchPDFReader/xs/sqlite3/db.lock
+.vs/mTouchPDFReader/xs/sqlite3/storage.ide
+.vs/mTouchPDFReader/xs/sqlite3/storage.ide-shm
+.vs/mTouchPDFReader/xs/sqlite3/storage.ide-wal

@@ -24,36 +24,43 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-using MonoTouch.ObjCRuntime;
+using CoreGraphics;
+using Foundation;
+using UIKit;
+using CoreGraphics;
+using ObjCRuntime;
+using System.Threading;
+using System.Diagnostics;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
+
 	public class PageContentView : UIView
-	{			
-		#region Data		
-		[Export("layerClass")]
-		public static Class LayerClass()
+	{
+		#region Data
+
+		[Export ("layerClass")]
+		public static Class LayerClass ()
 		{
-			return new Class(typeof(PageContentTile));
+			return new Class (typeof (PageContentTile));
 		}
 
 		public int PageNumber {
-			get { 
-				return _pageNumber; 
+			get {
+				return _pageNumber;
 			}
 			set {
 				_pageNumber = value;
 			}
-		}	
+		}
+
 		private int _pageNumber;
+
 		#endregion
-		
-		#region Logic		
-		public PageContentView(RectangleF frame, int pageNumber) : base(frame)
+
+		#region Logic
+
+		public PageContentView (CGRect frame, int pageNumber) : base (frame)
 		{
 			_pageNumber = pageNumber;
 			AutosizesSubviews = false;
@@ -63,11 +70,11 @@ namespace mTouchPDFReader.Library.Views.Core
 			AutoresizingMask = UIViewAutoresizing.None;
 			BackgroundColor = UIColor.Clear;
 			(Layer as PageContentTile).OnDraw = draw;
-		}		
-		
-		public static RectangleF GetPageViewSize(int pageNumber)
+		}
+
+		public static CGRect GetPageViewSize (int pageNumber)
 		{
-			RectangleF pageRect = RectangleF.Empty;
+			CGRect pageRect = CGRect.Empty;
 			if (PDFDocument.DocumentHasLoaded) {
 				if (pageNumber < 1) {
 					pageNumber = 1;
@@ -77,24 +84,24 @@ namespace mTouchPDFReader.Library.Views.Core
 					pageNumber = PDFDocument.PageCount;
 				}
 
-				using (CGPDFPage pdfPage = PDFDocument.GetPage(pageNumber)) {
+				using (CGPDFPage pdfPage = PDFDocument.GetPage (pageNumber)) {
 					if (pdfPage != null) {
-						RectangleF cropBoxRect = pdfPage.GetBoxRect(CGPDFBox.Crop);
-						RectangleF mediaBoxRect = pdfPage.GetBoxRect(CGPDFBox.Media);
-						RectangleF effectiveRect = RectangleF.Intersect(cropBoxRect, mediaBoxRect);
-			
+						CGRect cropBoxRect = pdfPage.GetBoxRect (CGPDFBox.Crop);
+						CGRect mediaBoxRect = pdfPage.GetBoxRect (CGPDFBox.Media);
+						CGRect effectiveRect = CGRect.Intersect (cropBoxRect, mediaBoxRect);
+
 						switch (pdfPage.RotationAngle) {
-							default:
-							case 0:
-							case 180:
-								pageRect.Width = effectiveRect.Size.Width;
-								pageRect.Height = effectiveRect.Size.Height;
-								break;
-							case 90:
-							case 270:
-								pageRect.Height = effectiveRect.Size.Width;
-								pageRect.Width = effectiveRect.Size.Height;
-								break;
+						default:
+						case 0:
+						case 180:
+							pageRect.Width = effectiveRect.Size.Width;
+							pageRect.Height = effectiveRect.Size.Height;
+							break;
+						case 90:
+						case 270:
+							pageRect.Height = effectiveRect.Size.Width;
+							pageRect.Width = effectiveRect.Size.Height;
+							break;
 						}
 						if (pageRect.Width % 2 > 0) {
 							pageRect.Width--;
@@ -102,28 +109,35 @@ namespace mTouchPDFReader.Library.Views.Core
 						if (pageRect.Height % 2 > 0) {
 							pageRect.Height--;
 						}
-					} 
+					}
 				}
 			}
 			return pageRect;
 		}
-		
-		private void draw(CGContext context)
+
+		private int _tileCount;
+
+		private void draw (CGContext context)
 		{
 			if (!PDFDocument.DocumentHasLoaded) {
 				return;
 			}
 
-			context.SetFillColor(1.0f, 1.0f, 1.0f, 1.0f);
-			using (CGPDFPage pdfPage = PDFDocument.GetPage(_pageNumber)) {
-				context.TranslateCTM(0, Bounds.Height);
-				context.ScaleCTM(1.0f, -1.0f);
-				context.ConcatCTM(pdfPage.GetDrawingTransform(CGPDFBox.Crop, Bounds, 0, true));
-				context.SetRenderingIntent(CGColorRenderingIntent.Default);
+			context.SetFillColor (1.0f, 1.0f, 1.0f, 1.0f);
+			using (CGPDFPage pdfPage = PDFDocument.GetPage (_pageNumber)) {
+				context.TranslateCTM (0, Bounds.Height);
+				context.ScaleCTM (1.0f, -1.0f);
+				context.ConcatCTM (pdfPage.GetDrawingTransform (CGPDFBox.Crop, Bounds, 0, true));
+				context.SetRenderingIntent (CGColorRenderingIntent.Default);
 				context.InterpolationQuality = CGInterpolationQuality.Default;
-				context.DrawPDFPage(pdfPage);
+				context.DrawPDFPage (pdfPage);
+
+				Interlocked.Increment (ref _tileCount);
+
+				Debug.WriteLine (_tileCount);
 			}
-		}			
+		}
+
 		#endregion
 	}
 }

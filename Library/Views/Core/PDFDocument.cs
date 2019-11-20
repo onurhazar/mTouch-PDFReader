@@ -25,21 +25,24 @@
 //
 
 using System;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
+using UIKit;
+using CoreGraphics;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
+
 	public static class PDFDocument
-	{	
-		#region Data		
+	{
+		#region Data
+
 		public static bool DocumentHasLoaded {
 			get {
 				return _documentHasLoaded;
 			}
 		}
+
 		private static bool _documentHasLoaded;
-		
+
 		private static CGPDFDocument _document;
 
 		public static string DocName {
@@ -47,6 +50,7 @@ namespace mTouchPDFReader.Library.Views.Core
 				return _docName;
 			}
 		}
+
 		private static string _docName;
 
 		public static string DocFilePath {
@@ -54,11 +58,12 @@ namespace mTouchPDFReader.Library.Views.Core
 				return _docFilePath;
 			}
 		}
+
 		private static string _docFilePath;
-		
+
 		public static int CurrentPageNumber {
-			get { 
-				return _currentPageNumber; 
+			get {
+				return _currentPageNumber;
 			}
 			set {
 				if ((_document != null) && (value >= 1) && (value <= _document.Pages)) {
@@ -66,58 +71,62 @@ namespace mTouchPDFReader.Library.Views.Core
 				}
 			}
 		}
+
 		private static int _currentPageNumber;
-		
+
 		public static int PageCount {
 			get {
 				if (_document != null) {
-					return _document.Pages;
+					return (int)_document.Pages;
 				}
 				return 0;
 			}
-		}		
-		#endregion		
+		}
+
+		#endregion
 
 		#region Logic
-		static PDFDocument()
+
+		static PDFDocument ()
 		{
 			_documentHasLoaded = false;
 			_currentPageNumber = -1;
 		}
-		
-		public static void OpenDocument(string docName, string docFilePath)
+
+		public static void OpenDocument (string docName, string docFilePath)
 		{
-			CloseDocument();
+			CloseDocument ();
 
 			_currentPageNumber = -1;
 			_docName = docName;
 			_docFilePath = docFilePath;
 			try {
-				_document = CGPDFDocument.FromFile(_docFilePath);
+				_document = CGPDFDocument.FromFile (_docFilePath);
 				_documentHasLoaded = true;
 			} catch (Exception) {
 				_documentHasLoaded = false;
-				using (var alert = new UIAlertView("Error", "Open PDF document error", null, "Ok")) {
-					alert.Show();
+				using (var alert = new UIAlertView ("Error", "Open PDF document error", null, "Ok")) {
+					alert.Show ();
 				}
-			}			
-		}	
-		
-		public static void CloseDocument()
+			}
+		}
+
+		public static void CloseDocument ()
 		{
 			if (_document != null) {
 				_documentHasLoaded = false;
-				_document.Dispose();
+				_document.Dispose ();
 			}
 		}
-		
-		public static CGPDFPage GetPage(int pageNumber)
+
+		public static CGPDFPage GetPage (int pageNumber)
 		{
 			if ((_document != null) && (pageNumber > 0) && (pageNumber <= PageCount)) {
-				return _document.GetPage(pageNumber);
+				return _document.GetPage (pageNumber);
 			}
 			return null;
 		}
+
 		#endregion
 	}
 }

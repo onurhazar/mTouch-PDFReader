@@ -25,9 +25,9 @@
 //
 
 using System;
-using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using Foundation;
+using UIKit;
 using mTouchPDFReader.Library.Managers;
 using mTouchPDFReader.Library.Data.Objects;
 using mTouchPDFReader.Library.Data.Enums;
@@ -38,7 +38,7 @@ namespace mTouchPDFReader.Library.Views.Management
 	{
 		#region Constants & Fields
 		private const int DefaultLabelLeft = 15;
-		private const int DefaultLabelWidth = 200;	
+		private const int DefaultLabelWidth = 200;
 		private UITableViewCell _pageTransitionStyleCell;
 		private UITableViewCell _pageNavigationOrientationCell;
 		private UITableViewCell _autoScaleMode;
@@ -47,314 +47,307 @@ namespace mTouchPDFReader.Library.Views.Management
 		private UITableViewCell _zoomScaleLevelsCell;
 		private UITableViewCell _zoomByDoubleTouchCell;
 		private UITableViewCell _libraryReleaseDateCell;
-		private UITableViewCell _libraryVersionCell;		
+		private UITableViewCell _libraryVersionCell;
 		#endregion
-		
+
 		#region Constructors		
-		public SettingsTableVC() : base(null, null) { }
-		#endregion	
+		public SettingsTableVC () : base (null, null) { }
+		#endregion
 
 		#region UIViewController members
-		public override void ViewDidLoad()
+		public override void ViewDidLoad ()
 		{
-			base.ViewDidLoad();
+			base.ViewDidLoad ();
 
 			View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-   
-			_pageTransitionStyleCell = createPageTransitionStyleCell();
-			_pageNavigationOrientationCell = createPageNavigationOrientationCell();
-			_autoScaleMode = createAutoScaleModeCell();
 
-			_topToolbarVisibilityCell = createTopToolbarVisibilityCell();
-			_bottomToolbarVisibilityCell = createBottomBarVisibilityCell();
+			_pageTransitionStyleCell = createPageTransitionStyleCell ();
+			_pageNavigationOrientationCell = createPageNavigationOrientationCell ();
+			_autoScaleMode = createAutoScaleModeCell ();
 
-			_zoomScaleLevelsCell = createZoomScaleLevelsCell();
-			_zoomByDoubleTouchCell = createmZoomByDoubleTouchCell();
+			_topToolbarVisibilityCell = createTopToolbarVisibilityCell ();
+			_bottomToolbarVisibilityCell = createBottomBarVisibilityCell ();
 
-			_libraryReleaseDateCell = createLibraryReleaseDateCell();
-			_libraryVersionCell = createLibraryVersionCell();
+			_zoomScaleLevelsCell = createZoomScaleLevelsCell ();
+			_zoomByDoubleTouchCell = createmZoomByDoubleTouchCell ();
 
-			TableView = new UITableView(View.Bounds, UITableViewStyle.Grouped)
-				{
-					BackgroundView = null, 
-					AutoresizingMask = UIViewAutoresizing.All, 
-					Source = new DataSource(this)
-				};
+			_libraryReleaseDateCell = createLibraryReleaseDateCell ();
+			_libraryVersionCell = createLibraryVersionCell ();
+
+			TableView = new UITableView (View.Bounds, UITableViewStyle.Grouped) {
+				BackgroundView = null,
+				AutoresizingMask = UIViewAutoresizing.All,
+				Source = new DataSource (this)
+			};
 		}
 		#endregion
-		
+
 		#region Create controls helpers		
-		private UITableViewCell createCell(string id)
+		private UITableViewCell createCell (string id)
 		{
-			var cell = new UITableViewCell(UITableViewCellStyle.Default, id)
-				{
-					AutoresizingMask = UIViewAutoresizing.All,
-					BackgroundColor = UIColor.White,
-					SelectionStyle = UITableViewCellSelectionStyle.None
-				};
+			var cell = new UITableViewCell (UITableViewCellStyle.Default, id) {
+				AutoresizingMask = UIViewAutoresizing.All,
+				BackgroundColor = UIColor.White,
+				SelectionStyle = UITableViewCellSelectionStyle.None
+			};
 			return cell;
 		}
-		
-		private UILabel createTitleLabelControl(string title)
+
+		private UILabel createTitleLabelControl (string title)
 		{
-			var label = new UILabel(new RectangleF(DefaultLabelLeft, 15, DefaultLabelWidth, 20))
-				{
-					AutoresizingMask = UIViewAutoresizing.All, 
-					BackgroundColor = UIColor.Clear, 
-					Text = title
-				};
+			var label = new UILabel (new CGRect (DefaultLabelLeft, 15, DefaultLabelWidth, 20)) {
+				AutoresizingMask = UIViewAutoresizing.All,
+				BackgroundColor = UIColor.Clear,
+				Text = title
+			};
 			return label;
 		}
-			
-		private UILabel createValueLabelControl(RectangleF cellRect, string title)
+
+		private UILabel createValueLabelControl (CGRect cellRect, string title)
 		{
 			const int width = 150;
-			var label = new UILabel(new RectangleF(cellRect.Width - DefaultLabelLeft - width, 15, width, 20))
-	            {
-					AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin, 
-					BackgroundColor = UIColor.Clear, 
-					TextAlignment = UITextAlignment.Right, 
-					Text = title
-	            };
+			var label = new UILabel (new CGRect (cellRect.Width - DefaultLabelLeft - width, 15, width, 20)) {
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin,
+				BackgroundColor = UIColor.Clear,
+				TextAlignment = UITextAlignment.Right,
+				Text = title
+			};
 			return label;
 		}
-		
-		private UISegmentedControl createSegmentControl(RectangleF cellRect, string[] values, int width)
+
+		private UISegmentedControl createSegmentControl (CGRect cellRect, string [] values, int width)
 		{
-			var seg = new UISegmentedControl(new RectangleF(cellRect.Width - DefaultLabelLeft - width, 5, width, 30))
-				{
-					AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin
-				};
+			var seg = new UISegmentedControl (new CGRect (cellRect.Width - DefaultLabelLeft - width, 5, width, 30)) {
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin
+			};
 			for (int i = 0; i < values.Length; i++) {
-				seg.InsertSegment(values [i], i, false);
+				seg.InsertSegment (values [i], i, false);
 			}
 			return seg;
 		}
-		
-		private UISwitch createSwitchControl(RectangleF cellRect, string[] values)
+
+		private UISwitch createSwitchControl (CGRect cellRect, string [] values)
 		{
 			const int width = 50;
-			var ctrl = new UISwitch(new RectangleF(cellRect.Width - DefaultLabelLeft - width, 5, width, 30))
-				{
-					AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin
-				};
+			var ctrl = new UISwitch (new CGRect (cellRect.Width - DefaultLabelLeft - width, 5, width, 30)) {
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin
+			};
 			return ctrl;
 		}
-		
-		private UISlider createSliderControl(RectangleF cellRect, int minValue, int maxValue)
+
+		private UISlider createSliderControl (CGRect cellRect, int minValue, int maxValue)
 		{
 			const int width = 100;
-			var slider = new UISlider(new RectangleF(cellRect.Width - DefaultLabelLeft - width, 5, width, 30))
-				{
-					AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin, 
-					MinValue = minValue, 
-					MaxValue = maxValue
-				};
+			var slider = new UISlider (new CGRect (cellRect.Width - DefaultLabelLeft - width, 5, width, 30)) {
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin,
+				MinValue = minValue,
+				MaxValue = maxValue
+			};
 			return slider;
 		}
 		#endregion
 
 		#region Create cells
-		private UITableViewCell createPageTransitionStyleCell()
+		private UITableViewCell createPageTransitionStyleCell ()
 		{
-			var cell = createCell("PageTransitionStyleCell");
-			var label = createTitleLabelControl("Transition style".t());
-			var seg = createSegmentControl(cell.Frame, new[] { "Curl".t(), "Scroll".t() }, 100);
+			var cell = createCell ("PageTransitionStyleCell");
+			var label = createTitleLabelControl ("Transition style".t ());
+			var seg = createSegmentControl (cell.Frame, new [] { "Curl".t (), "Scroll".t () }, 100);
 			seg.SelectedSegment = (int)MgrAccessor.SettingsMgr.Settings.PageTransitionStyle;
 			seg.ValueChanged += delegate {
-				MgrAccessor.SettingsMgr.Settings.PageTransitionStyle = (UIPageViewControllerTransitionStyle)seg.SelectedSegment;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Settings.PageTransitionStyle = (UIPageViewControllerTransitionStyle)(int)seg.SelectedSegment;
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(seg);
+			cell.AddSubview (label);
+			cell.AddSubview (seg);
 			return cell;
 		}
 
-		private UITableViewCell createPageNavigationOrientationCell()
+		private UITableViewCell createPageNavigationOrientationCell ()
 		{
-			var cell = createCell("PageNavigationOrientationCell");
-			var label = createTitleLabelControl("Navigation orientation".t());
-			var seg = createSegmentControl(cell.Frame, new[] { "Horizontal".t(), "Vertical".t() }, 100);
+			var cell = createCell ("PageNavigationOrientationCell");
+			var label = createTitleLabelControl ("Navigation orientation".t ());
+			var seg = createSegmentControl (cell.Frame, new [] { "Horizontal".t (), "Vertical".t () }, 100);
 			seg.SelectedSegment = (int)MgrAccessor.SettingsMgr.Settings.PageTransitionStyle;
 			seg.ValueChanged += delegate {
-				MgrAccessor.SettingsMgr.Settings.PageNavigationOrientation = (UIPageViewControllerNavigationOrientation)seg.SelectedSegment;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Settings.PageNavigationOrientation = (UIPageViewControllerNavigationOrientation)(int)seg.SelectedSegment;
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(seg);
+			cell.AddSubview (label);
+			cell.AddSubview (seg);
 			return cell;
 		}
-		
-		private UITableViewCell createTopToolbarVisibilityCell()
+
+		private UITableViewCell createTopToolbarVisibilityCell ()
 		{
-			var cell = createCell("TopToolbarVisibilityCell");
-			var label = createTitleLabelControl("Top Toolbar".t());
-			var switchCtrl = createSwitchControl(cell.Frame, new[] { "Yes".t(), "No".t() });
-			switchCtrl.SetState(MgrAccessor.SettingsMgr.Settings.TopToolbarVisible, false);
+			var cell = createCell ("TopToolbarVisibilityCell");
+			var label = createTitleLabelControl ("Top Toolbar".t ());
+			var switchCtrl = createSwitchControl (cell.Frame, new [] { "Yes".t (), "No".t () });
+			switchCtrl.SetState (MgrAccessor.SettingsMgr.Settings.TopToolbarVisible, false);
 			switchCtrl.ValueChanged += delegate {
 				MgrAccessor.SettingsMgr.Settings.TopToolbarVisible = switchCtrl.On;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(switchCtrl);
+			cell.AddSubview (label);
+			cell.AddSubview (switchCtrl);
 			return cell;
 		}
-		
-		private UITableViewCell createBottomBarVisibilityCell()
+
+		private UITableViewCell createBottomBarVisibilityCell ()
 		{
-			var cell = createCell("BottomToolbarVisibilityCell");
-			var label = createTitleLabelControl("Bottom Toolbar".t());
-			var switchCtrl = createSwitchControl(cell.Frame, new[] { "Yes".t(), "No".t() });
-			switchCtrl.SetState(MgrAccessor.SettingsMgr.Settings.BottomToolbarVisible, false);
+			var cell = createCell ("BottomToolbarVisibilityCell");
+			var label = createTitleLabelControl ("Bottom Toolbar".t ());
+			var switchCtrl = createSwitchControl (cell.Frame, new [] { "Yes".t (), "No".t () });
+			switchCtrl.SetState (MgrAccessor.SettingsMgr.Settings.BottomToolbarVisible, false);
 			switchCtrl.ValueChanged += delegate {
 				MgrAccessor.SettingsMgr.Settings.BottomToolbarVisible = switchCtrl.On;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(switchCtrl);
+			cell.AddSubview (label);
+			cell.AddSubview (switchCtrl);
 			return cell;
 		}
 
-		private UITableViewCell createAutoScaleModeCell()
+		private UITableViewCell createAutoScaleModeCell ()
 		{
-			var cell = createCell("AutoScaleModelCell");
-			var label = createTitleLabelControl("Auto scale mode".t());
-			var seg = createSegmentControl(cell.Frame, new[] { "Auto width".t(), "Auto height".t() }, 150);
+			var cell = createCell ("AutoScaleModelCell");
+			var label = createTitleLabelControl ("Auto scale mode".t ());
+			var seg = createSegmentControl (cell.Frame, new [] { "Auto width".t (), "Auto height".t () }, 150);
 			seg.SelectedSegment = (int)MgrAccessor.SettingsMgr.Settings.AutoScaleMode;
 			seg.ValueChanged += delegate {
-				MgrAccessor.SettingsMgr.Settings.AutoScaleMode = (AutoScaleModes)seg.SelectedSegment;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Settings.AutoScaleMode = (AutoScaleModes)(int)seg.SelectedSegment;
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(seg);
+			cell.AddSubview (label);
+			cell.AddSubview (seg);
 			return cell;
 		}
 
-		private UITableViewCell createZoomScaleLevelsCell()
+		private UITableViewCell createZoomScaleLevelsCell ()
 		{
-			var cell = createCell("ZoomScaleLevelsCell");
-			var label = createTitleLabelControl("Zoom scale levels".t());
-			var slider = createSliderControl(cell.Frame, Settings.MinZoomScaleLevels, Settings.MaxZoomScaleLevels);
-			slider.SetValue(MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels, false);
+			var cell = createCell ("ZoomScaleLevelsCell");
+			var label = createTitleLabelControl ("Zoom scale levels".t ());
+			var slider = createSliderControl (cell.Frame, Settings.MinZoomScaleLevels, Settings.MaxZoomScaleLevels);
+			slider.SetValue (MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels, false);
 			slider.ValueChanged += delegate {
 				MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels = (int)slider.Value;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(slider);
+			cell.AddSubview (label);
+			cell.AddSubview (slider);
 			return cell;
 		}
-		
-		private UITableViewCell createmZoomByDoubleTouchCell()
+
+		private UITableViewCell createmZoomByDoubleTouchCell ()
 		{
-			var cell = createCell("ZoomByDoubleTouchCell");
-			var label = createTitleLabelControl("Scale by double click".t());
-			var switchCtrl = createSwitchControl(cell.Frame, new[] { "Yes".t(), "No".t() });
-			switchCtrl.SetState(MgrAccessor.SettingsMgr.Settings.AllowZoomByDoubleTouch, false);
+			var cell = createCell ("ZoomByDoubleTouchCell");
+			var label = createTitleLabelControl ("Scale by double click".t ());
+			var switchCtrl = createSwitchControl (cell.Frame, new [] { "Yes".t (), "No".t () });
+			switchCtrl.SetState (MgrAccessor.SettingsMgr.Settings.AllowZoomByDoubleTouch, false);
 			switchCtrl.ValueChanged += delegate {
 				MgrAccessor.SettingsMgr.Settings.AllowZoomByDoubleTouch = switchCtrl.On;
-				MgrAccessor.SettingsMgr.Save();
+				MgrAccessor.SettingsMgr.Save ();
 			};
 
-			cell.AddSubview(label);
-			cell.AddSubview(switchCtrl);
+			cell.AddSubview (label);
+			cell.AddSubview (switchCtrl);
 			return cell;
 		}
-		
-		private UITableViewCell createLibraryReleaseDateCell()
-		{
-			var cell = createCell("LibraryReleaseDateCell");
-			var label = createTitleLabelControl("Release date".t());
-			var labelInfo = createValueLabelControl(cell.Frame, MgrAccessor.SettingsMgr.Settings.LibraryReleaseDate.ToShortDateString());			
 
-			cell.AddSubview(label);
-			cell.AddSubview(labelInfo);
+		private UITableViewCell createLibraryReleaseDateCell ()
+		{
+			var cell = createCell ("LibraryReleaseDateCell");
+			var label = createTitleLabelControl ("Release date".t ());
+			var labelInfo = createValueLabelControl (cell.Frame, MgrAccessor.SettingsMgr.Settings.LibraryReleaseDate.ToShortDateString ());
+
+			cell.AddSubview (label);
+			cell.AddSubview (labelInfo);
 			return cell;
 		}
-		
-		private UITableViewCell createLibraryVersionCell()
-		{
-			var cell = createCell("LibraryVersionCell");
-			var label = createTitleLabelControl("Version".t());
-			var labelInfo = createValueLabelControl(cell.Frame, MgrAccessor.SettingsMgr.Settings.LibraryVersion);
 
-			cell.AddSubview(label);
-			cell.AddSubview(labelInfo);
+		private UITableViewCell createLibraryVersionCell ()
+		{
+			var cell = createCell ("LibraryVersionCell");
+			var label = createTitleLabelControl ("Version".t ());
+			var labelInfo = createValueLabelControl (cell.Frame, MgrAccessor.SettingsMgr.Settings.LibraryVersion);
+
+			cell.AddSubview (label);
+			cell.AddSubview (labelInfo);
 			return cell;
-		}		
+		}
 		#endregion
 
 		#region Table DataSource
 		protected class DataSource : UITableViewSource
 		{
 			private const int SectionsCount = 4;
-			private readonly int[] RowsInSections = new[] { 2, 2, 3, 2 };
-			private readonly string[] SectionTitles = new[] { "Transition style".t(), "Visibility".t(), "Scale".t(), "Library information".t() };		
+			private readonly int [] RowsInSections = new [] { 2, 2, 3, 2 };
+			private readonly string [] SectionTitles = new [] { "Transition style".t (), "Visibility".t (), "Scale".t (), "Library information".t () };
 			private readonly SettingsTableVC _vc;
 
-			public DataSource(SettingsTableVC vc)
+			public DataSource (SettingsTableVC vc)
 			{
 				_vc = vc;
 			}
-		
-			public override int NumberOfSections(UITableView tableView)
+
+			public override nint NumberOfSections (UITableView tableView)
 			{
 				return SectionsCount;
 			}
-			
-			public override int RowsInSection(UITableView tableview, int section)
+
+			public override nint RowsInSection (UITableView tableview, nint section)
 			{
-				return RowsInSections[section];
+				return RowsInSections [section];
 			}
 
-			public override string TitleForHeader(UITableView tableView, int section)
+			public override string TitleForHeader (UITableView tableView, nint section)
 			{
-				return SectionTitles[section];
+				return SectionTitles [section];
 			}
 
-			public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+			public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 			{
 				switch (indexPath.Section) {
+				case 0:
+					switch (indexPath.Row) {
 					case 0:
-						switch (indexPath.Row) {
-							case 0:
-								return _vc._pageTransitionStyleCell;
-							case 1:
-								return _vc._pageNavigationOrientationCell;
-						}
-						break;
+						return _vc._pageTransitionStyleCell;
 					case 1:
-						switch (indexPath.Row) {
-							case 0:
-								return _vc._topToolbarVisibilityCell;
-							case 1:
-								return _vc._bottomToolbarVisibilityCell;
-						}
-						break;
+						return _vc._pageNavigationOrientationCell;
+					}
+					break;
+				case 1:
+					switch (indexPath.Row) {
+					case 0:
+						return _vc._topToolbarVisibilityCell;
+					case 1:
+						return _vc._bottomToolbarVisibilityCell;
+					}
+					break;
+				case 2:
+					switch (indexPath.Row) {
+					case 0:
+						return _vc._autoScaleMode;
+					case 1:
+						return _vc._zoomScaleLevelsCell;
 					case 2:
-						switch (indexPath.Row) {
-							case 0:
-								return _vc._autoScaleMode;
-							case 1:
-								return _vc._zoomScaleLevelsCell;
-							case 2:
-								return _vc._zoomByDoubleTouchCell;
-						}
-						break;
-					case 3:
-						switch (indexPath.Row) {
-							case 0:
-								return _vc._libraryReleaseDateCell;
-							case 1:
-								return _vc._libraryVersionCell;
-						}
-						break;
+						return _vc._zoomByDoubleTouchCell;
+					}
+					break;
+				case 3:
+					switch (indexPath.Row) {
+					case 0:
+						return _vc._libraryReleaseDateCell;
+					case 1:
+						return _vc._libraryVersionCell;
+					}
+					break;
 				}
 				return null;
 			}

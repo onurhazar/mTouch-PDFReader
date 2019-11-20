@@ -25,18 +25,21 @@
 //
 
 using System;
-using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using Foundation;
+using UIKit;
 using mTouchPDFReader.Library.Data.Enums;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
+
 	public class PageVC : UIViewController
 	{
 		#region Data
-		private readonly RectangleF _viewFrame;
+
+		private readonly CGRect _viewFrame;
 		private readonly AutoScaleModes _autoScaleMode;
+
 		public int PageNumber { get; private set; }
 
 		public PageView PageView {
@@ -50,35 +53,38 @@ namespace mTouchPDFReader.Library.Views.Core
 				return PageView != null;
 			}
 		}
+
 		#endregion
 
 		#region Logic
-		public PageVC(IntPtr handle) : base(handle)
+
+		public PageVC (IntPtr handle) : base (handle)
 		{
 		}
-		
-		[Export("initWithCoder:")]
-		public PageVC(NSCoder coder) : base(coder)
+
+		[Export ("initWithCoder:")]
+		public PageVC (NSCoder coder) : base (coder)
 		{
 		}
-		
-		public PageVC(RectangleF viewFrame, AutoScaleModes autoScaleMode, int pageNumber) : base(null, null)
+
+		public PageVC (CGRect viewFrame, AutoScaleModes autoScaleMode, int pageNumber) : base (null, null)
 		{
 			_viewFrame = viewFrame;
 			_autoScaleMode = autoScaleMode;
 			PageNumber = pageNumber;
-		}	
+		}
 
-		public override void ViewDidLoad()
+		public override void ViewDidLoad ()
 		{
-			base.ViewDidLoad();
+			base.ViewDidLoad ();
 
 			if (PageNumber == -1) {
 				View.BackgroundColor = UIColor.Clear;
 			} else {
-				View = new PageView(_viewFrame, _autoScaleMode, PageNumber);
+				View = new PageView (_viewFrame, _autoScaleMode, PageNumber);
 			}
 		}
+
 		#endregion
 	}
 }

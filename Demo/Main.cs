@@ -1,4 +1,4 @@
-﻿//
+//
 // mTouch-PDFReader demo
 // Main.cs
 //
@@ -27,16 +27,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 namespace mTouchPDFReader.Demo
 {
 	public class Application
 	{
-		static void Main(string[] args)
+		static void Main (string [] args)
 		{
-			UIApplication.Main(args, null, "AppDelegate");
+			UIApplication.Main (args, null, "AppDelegate");
 		}
 	}
 }

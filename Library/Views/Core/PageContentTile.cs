@@ -25,56 +25,62 @@
 //
 
 using System;
-using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.CoreAnimation;
-using MonoTouch.CoreGraphics;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using Foundation;
+using CoreAnimation;
+using CoreGraphics;
+using UIKit;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
-	[Register("PageContentTile")]
+
+	[Register ("PageContentTile")]
 	public class PageContentTile : CATiledLayer
-	{		
+	{
 		#region Data
+
 		public Action<CGContext> OnDraw {
 			get { return _onDraw; }
 			set { _onDraw = value; }
 		}
+
 		private Action<CGContext> _onDraw;
-		
-		[Export("fadeDuration")]
+
+		[Export ("fadeDuration")]
 		public static new double FadeDuration {
 			get { return 0.001; }
 		}
+
 		#endregion
 
 		#region Logic
-		public PageContentTile()
+
+		public PageContentTile ()
 		{
-			Initialize();
-        }
-		
-        public PageContentTile(IntPtr handle) : base(handle)
-        {
-			Initialize();
-        }
-		
-		public void Initialize()
+			Initialize ();
+		}
+
+		public PageContentTile (IntPtr handle) : base (handle)
+		{
+			Initialize ();
+		}
+
+		public void Initialize ()
 		{
 			LevelsOfDetail = 4;
 			LevelsOfDetailBias = 3;
-			float wPixels = (UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
-			float hPixels = (UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
+			float wPixels = (float)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
+			float hPixels = (float)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
 			float max = (wPixels < hPixels) ? hPixels : wPixels;
 			float sizeOfTiles = (max < 512.0f) ? 512.0f : 1024.0f;
-			TileSize = new SizeF(sizeOfTiles, sizeOfTiles);
-		}	
-		
-		public override void DrawInContext(CGContext ctx)
-		{
-			_onDraw(ctx);
+			TileSize = new CGSize (sizeOfTiles, sizeOfTiles);
 		}
+
+		public override void DrawInContext (CGContext ctx)
+		{
+			_onDraw (ctx);
+		}
+
 		#endregion
 	}
 }

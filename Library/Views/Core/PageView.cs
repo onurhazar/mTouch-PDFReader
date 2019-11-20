@@ -24,26 +24,28 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
+using CoreGraphics;
+using Foundation;
+using UIKit;
+using CoreGraphics;
 using mTouchPDFReader.Library.Managers;
 using mTouchPDFReader.Library.Data.Enums;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
+
 	public class PageView : UIScrollView
 	{
-		#region Data		
+		#region Data
+
 		private const float ContentViewPadding = 5.0f;
-		private const int ThumbContentSize = 500;		
+		private const int ThumbContentSize = 500;
 
 		private readonly PageContentView _pageContentView;
 		// TODO: private readonly ThumbView _thumbView;
-		private readonly UIView _pageContentContainerView;	
+		private readonly UIView _pageContentContainerView;
 		private float _zoomScaleStep;
-	
+
 		public int PageNumber {
 			get {
 				return _pageContentView.PageNumber;
@@ -51,14 +53,17 @@ namespace mTouchPDFReader.Library.Views.Core
 			set {
 				_pageContentView.PageNumber = value;
 			}
-		}		
+		}
 
 		public bool NeedUpdateZoomAndOffset { get; set; }
+
 		public AutoScaleModes AutoScaleMode { get; set; }
+
 		#endregion
-		
-		#region Logic		
-		public PageView(RectangleF frame, AutoScaleModes autoScaleMode, int pageNumber) : base(frame)
+
+		#region Logic
+
+		public PageView (CGRect frame, AutoScaleModes autoScaleMode, int pageNumber) : base (frame)
 		{
 			ScrollsToTop = false;
 			DelaysContentTouches = false;
@@ -69,133 +74,134 @@ namespace mTouchPDFReader.Library.Views.Core
 			UserInteractionEnabled = true;
 			AutosizesSubviews = false;
 			BackgroundColor = UIColor.Clear;
-			ViewForZoomingInScrollView = delegate(UIScrollView sender) { 
-				return _pageContentContainerView; 
+			ViewForZoomingInScrollView = delegate (UIScrollView sender) {
+				return _pageContentContainerView;
 			};
 			AutoScaleMode = autoScaleMode;
 			NeedUpdateZoomAndOffset = true;
-			
-			_pageContentView = new PageContentView(PageContentView.GetPageViewSize(pageNumber), pageNumber);
-			
-			_pageContentContainerView = new UIView(_pageContentView.Bounds);
+
+			_pageContentView = new PageContentView (PageContentView.GetPageViewSize (pageNumber), pageNumber);
+
+			_pageContentContainerView = new UIView (_pageContentView.Bounds);
 			_pageContentContainerView.AutosizesSubviews = false;
 			_pageContentContainerView.UserInteractionEnabled = false;
 			_pageContentContainerView.ContentMode = UIViewContentMode.Redraw;
 			_pageContentContainerView.AutoresizingMask = UIViewAutoresizing.None;
-			_pageContentContainerView.Layer.CornerRadius = 5;
-			_pageContentContainerView.Layer.ShadowOffset = new SizeF(2.0f, 2.0f);
-			_pageContentContainerView.Layer.ShadowRadius = 4.0f;
-			_pageContentContainerView.Layer.ShadowOpacity = 1.0f;
-			_pageContentContainerView.Layer.ShadowPath = UIBezierPath.FromRect(_pageContentContainerView.Bounds).CGPath;
-			_pageContentContainerView.BackgroundColor = UIColor.White;			
-			
+			//_pageContentContainerView.Layer.CornerRadius = 5;
+			//			_pageContentContainerView.Layer.ShadowOffset = new SizeF(2.0f, 2.0f);
+			//			_pageContentContainerView.Layer.ShadowRadius = 4.0f;
+			//			_pageContentContainerView.Layer.ShadowOpacity = 1.0f;
+			//			_pageContentContainerView.Layer.ShadowPath = UIBezierPath.FromRect(_pageContentContainerView.Bounds).CGPath;
+			_pageContentContainerView.BackgroundColor = UIColor.Clear;
+
 			// TODO: _ThumbView = new ThumbView(_PageContentView.Bounds, ThumbContentSize, pageNumber);
-			
+
 			// TODO: _PageContentContainerView.AddSubview(_ThumbView);
-			_pageContentContainerView.AddSubview(_pageContentView);						
-			AddSubview(_pageContentContainerView);
-			
+			_pageContentContainerView.AddSubview (_pageContentView);
+			AddSubview (_pageContentContainerView);
+
 			ContentSize = _pageContentView.Bounds.Size;
-			ContentOffset = new PointF((0.0f - ContentViewPadding), (0.0f - ContentViewPadding));
-			ContentInset = new UIEdgeInsets(ContentViewPadding, ContentViewPadding, ContentViewPadding, ContentViewPadding);
+			ContentOffset = new CGPoint ((0.0f - ContentViewPadding), (0.0f - ContentViewPadding));
+			ContentInset = new UIEdgeInsets (ContentViewPadding, ContentViewPadding, ContentViewPadding, ContentViewPadding);
 			ContentSize = _pageContentContainerView.Bounds.Size;
 		}
 
-		public override void LayoutSubviews()
+		public override void LayoutSubviews ()
 		{
-			base.LayoutSubviews();	
+			base.LayoutSubviews ();
 
 			if (NeedUpdateZoomAndOffset) {
-				updateMinimumMaximumZoom();
-				resetZoom();
-				resetScrollOffset();
+				updateMinimumMaximumZoom ();
+				resetZoom ();
+				resetScrollOffset ();
 				NeedUpdateZoomAndOffset = false;
-			}	
+			}
 
-			alignPageContentView();
+			alignPageContentView ();
 		}
-		
-		public override void TouchesBegan(NSSet touches, UIEvent evt)
-		{
-			base.TouchesBegan(touches, evt);
-			
-			if (MgrAccessor.SettingsMgr.Settings.AllowZoomByDoubleTouch) {
-				var touch = touches.AnyObject as UITouch; 
-				if (touch.TapCount == 2) { 
-					ZoomIncrement(); 
-				}
-			}			
-		}		
 
-		private void alignPageContentView()
+		public override void TouchesBegan (NSSet touches, UIEvent evt)
 		{
-			SizeF boundsSize = Bounds.Size;
-			RectangleF viewFrame = _pageContentContainerView.Frame;		
+			base.TouchesBegan (touches, evt);
+
+			if (MgrAccessor.SettingsMgr.Settings.AllowZoomByDoubleTouch) {
+				var touch = touches.AnyObject as UITouch;
+				if (touch.TapCount == 2) {
+					ZoomIncrement ();
+				}
+			}
+		}
+
+		private void alignPageContentView ()
+		{
+			CGSize boundsSize = Bounds.Size;
+			CGRect viewFrame = _pageContentContainerView.Frame;
 			if (viewFrame.Size.Width < boundsSize.Width) {
 				viewFrame.X = (boundsSize.Width - viewFrame.Size.Width) / 2.0f + ContentOffset.X;
 			} else {
 				viewFrame.X = 0.0f;
-			}		
+			}
 			if (viewFrame.Size.Height < boundsSize.Height) {
 				viewFrame.Y = (boundsSize.Height - viewFrame.Size.Height) / 2.0f + ContentOffset.Y;
 			} else {
 				viewFrame.Y = 0.0f;
-			}	
+			}
 			_pageContentContainerView.Frame = viewFrame;
 		}
 
-		private float getZoomScaleThatFits(SizeF target, SizeF source)
+		private float getZoomScaleThatFits (CGSize target, CGSize source)
 		{
-			float wScale = target.Width / source.Width;
-			float hScale = target.Height / source.Height;
-			var factor = AutoScaleMode == AutoScaleModes.AutoWidth 
+			float wScale = (float)(target.Width / source.Width);
+			float hScale = (float)(target.Height / source.Height);
+			var factor = AutoScaleMode == AutoScaleModes.AutoWidth
 				? (wScale < hScale ? hScale : wScale)
 				: (wScale < hScale ? wScale : hScale);
 			return factor;
 		}
-		
-		private void updateMinimumMaximumZoom()
+
+		private void updateMinimumMaximumZoom ()
 		{
-			RectangleF targetRect = RectangleFExtensions.Inset(Bounds, ContentViewPadding, ContentViewPadding);
-			float zoomScale = getZoomScaleThatFits(targetRect.Size, _pageContentView.Bounds.Size);
-			MinimumZoomScale = zoomScale; 	
-			MaximumZoomScale = zoomScale * MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels; 
-			_zoomScaleStep = (MaximumZoomScale - MinimumZoomScale) / MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels;
+			CGRect targetRect = RectangleFExtensions.Inset (Bounds, ContentViewPadding, ContentViewPadding);
+			float zoomScale = getZoomScaleThatFits (targetRect.Size, _pageContentView.Bounds.Size);
+			MinimumZoomScale = zoomScale;
+			MaximumZoomScale = zoomScale * MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels;
+			_zoomScaleStep = (float)(MaximumZoomScale - MinimumZoomScale) / MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels;
 		}
 
-		private void resetScrollOffset()
+		private void resetScrollOffset ()
 		{
-			SetContentOffset(new PointF(0.0f, 0.0f), false);
+			SetContentOffset (new CGPoint (0.0f, 0.0f), false);
 		}
 
-		private void resetZoom()
+		private void resetZoom ()
 		{
 			ZoomScale = MinimumZoomScale;
 		}
 
-		public void ZoomDecrement()
+		public void ZoomDecrement ()
 		{
-			float zoomScale = ZoomScale;
+			float zoomScale = (float)ZoomScale;
 			if (zoomScale > MinimumZoomScale) {
 				zoomScale -= _zoomScaleStep;
 				if (zoomScale < MinimumZoomScale) {
-					zoomScale = MinimumZoomScale;
+					zoomScale = (float)MinimumZoomScale;
 				}
-				SetZoomScale(zoomScale, true);
+				SetZoomScale (zoomScale, true);
 			}
 		}
-		
-		public void ZoomIncrement()
+
+		public void ZoomIncrement ()
 		{
-			float zoomScale = ZoomScale;
+			float zoomScale = (float)ZoomScale;
 			if (zoomScale < MaximumZoomScale) {
 				zoomScale += _zoomScaleStep;
 				if (zoomScale > MaximumZoomScale) {
-					zoomScale = MaximumZoomScale;
+					zoomScale = (float)MaximumZoomScale;
 				}
-				SetZoomScale(zoomScale, true);
+				SetZoomScale (zoomScale, true);
 			}
-		}		
+		}
+
 		#endregion
 	}
 }

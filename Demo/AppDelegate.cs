@@ -1,4 +1,4 @@
-﻿//
+//
 // mTouch-PDFReader demo
 // AppDelegate.cs
 //
@@ -28,8 +28,8 @@ using Autofac;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using mTouchPDFReader.Library.Interfaces;
 using mTouchPDFReader.Library.Managers;
 using mTouchPDFReader.Demo.Managers;

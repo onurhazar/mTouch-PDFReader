@@ -24,92 +24,91 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Drawing;
-using MonoTouch.CoreGraphics;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using UIKit;
 
 namespace mTouchPDFReader.Library.Views.Core
 {
 	public class ThumbView : UIView
-	{							
+	{
 		#region Data		
 		public int PageNumber {
-			get { 
-				return _pageNumber; 
+			get {
+				return _pageNumber;
 			}
 			set {
 				if (value != _pageNumber) {
 					_pageNumber = value;
-					_imageView.Image = GetThumbImage(_thumbContentSize, _pageNumber);
+					_imageView.Image = GetThumbImage (_thumbContentSize, _pageNumber);
 				}
 			}
 		}
 		private int _pageNumber;
-		
+
 		private readonly float _thumbContentSize;
-		private readonly UIImageView _imageView;		
+		private readonly UIImageView _imageView;
 		#endregion
-		
+
 		#region UIView members		
-		public ThumbView(RectangleF frame, float thumbContentSize, int pageNumber) : base(frame)
+		public ThumbView (CGRect frame, float thumbContentSize, int pageNumber) : base (frame)
 		{
-			_pageNumber = pageNumber;			
+			_pageNumber = pageNumber;
 			_thumbContentSize = thumbContentSize;
-			
+
 			AutosizesSubviews = false;
 			UserInteractionEnabled = false;
 			ContentMode = UIViewContentMode.Redraw;
 			AutoresizingMask = UIViewAutoresizing.None;
 			BackgroundColor = UIColor.Clear;
-			
-			_imageView = new UIImageView(Bounds);
+
+			_imageView = new UIImageView (Bounds);
 			_imageView.AutosizesSubviews = false;
 			_imageView.UserInteractionEnabled = false;
 			_imageView.ContentMode = UIViewContentMode.ScaleAspectFit;
 			_imageView.AutoresizingMask = UIViewAutoresizing.None;
 			_imageView.BackgroundColor = UIColor.Clear;
 			_imageView.ClipsToBounds = true;
-			_imageView.Image = GetThumbImage(_thumbContentSize, _pageNumber);
+			_imageView.Image = GetThumbImage (_thumbContentSize, _pageNumber);
 
-			AddSubview(_imageView);
-		}				
+			AddSubview (_imageView);
+		}
 		#endregion
-		
+
 		#region Logic		
-		private static UIImage GetThumbImage(float thumbContentSize, int pageNumber)
+		private static UIImage GetThumbImage (float thumbContentSize, int pageNumber)
 		{
 			if ((pageNumber <= 0) || (pageNumber > PDFDocument.PageCount)) {
 				return null;
 			}
-			
-			var pageSize = PageContentView.GetPageViewSize(pageNumber);
+
+			var pageSize = PageContentView.GetPageViewSize (pageNumber);
 			if (pageSize.Width % 2 > 0) {
 				pageSize.Width--;
 			}
 			if (pageSize.Height % 2 > 0) {
 				pageSize.Height--;
 			}
-			
-			var targetSize = new Size((int)pageSize.Width, (int)pageSize.Height);
-			
-			CGImage pageImage;
-			using (CGColorSpace rgb = CGColorSpace.CreateDeviceRGB()) {
-				using (var context = new CGBitmapContext(null, targetSize.Width, targetSize.Height, 8, 0, rgb, CGBitmapFlags.ByteOrder32Little | CGBitmapFlags.NoneSkipFirst)) {
-					using (var pdfPage = PDFDocument.GetPage(pageNumber)) {
-						var thumbRect = new RectangleF(0.0f, 0.0f, targetSize.Width, targetSize.Height);
-						context.SetFillColor(1.0f, 1.0f, 1.0f, 1.0f);
-						context.FillRect(thumbRect);
-						context.ConcatCTM(pdfPage.GetDrawingTransform(CGPDFBox.Crop, thumbRect, 0, true));
-						context.SetRenderingIntent(CGColorRenderingIntent.Default);
-						context.InterpolationQuality = CGInterpolationQuality.Default;
-						context.DrawPDFPage(pdfPage);
 
-						pageImage = context.ToImage();
+			var targetSize = new CGSize ((int)pageSize.Width, (int)pageSize.Height);
+
+			CGImage pageImage;
+			using (CGColorSpace rgb = CGColorSpace.CreateDeviceRGB ()) {
+				using (var context = new CGBitmapContext (null, (int)targetSize.Width, (int)targetSize.Height, 8, 0, rgb, CGBitmapFlags.ByteOrder32Little | CGBitmapFlags.NoneSkipFirst)) {
+					using (var pdfPage = PDFDocument.GetPage (pageNumber)) {
+						var thumbRect = new CGRect (0.0f, 0.0f, targetSize.Width, targetSize.Height);
+						context.SetFillColor (1.0f, 1.0f, 1.0f, 1.0f);
+						context.FillRect (thumbRect);
+						context.ConcatCTM (pdfPage.GetDrawingTransform (CGPDFBox.Crop, thumbRect, 0, true));
+						context.SetRenderingIntent (CGColorRenderingIntent.Default);
+						context.InterpolationQuality = CGInterpolationQuality.Default;
+						context.DrawPDFPage (pdfPage);
+
+						pageImage = context.ToImage ();
 					}
 				}
-			}			
-			return UIImage.FromImage(pageImage);			
-		}		
+			}
+			return UIImage.FromImage (pageImage);
+		}
 		#endregion
 	}
 }

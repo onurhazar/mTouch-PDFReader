@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9DAD0158-D923-48BF-BC35-1014C00B7C95}</ProjectGuid>
@@ -11,6 +11,8 @@
     <RootNamespace>mTouchPDFReaderLibrary</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>mTouchPDFReaderLibrary</AssemblyName>
+    <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,10 +36,10 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
     <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.3.5.2\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Autofac.dll</HintPath>
+      <HintPath>..\packages\Autofac.4.9.4\lib\netstandard2.0\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -74,7 +76,6 @@
     <Compile Include="Managers\DocumentBookmarksManager.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <ItemGroup>
     <Content Include="en.lproj\Localizable.strings" />
     <Content Include="ru.lproj\Localizable.strings" />
@@ -140,4 +141,5 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

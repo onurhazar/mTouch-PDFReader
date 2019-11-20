@@ -24,15 +24,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using MonoTouch.Foundation;
+using Foundation;
 
 namespace mTouchPDFReader.Library.Managers
 {
 	public static class LocalizationManager
 	{
-		public static string t(this string key)
+		public static string t (this string key)
 		{
-			return NSBundle.MainBundle.LocalizedString(key, "", "");
-		}		
+			return NSBundle.MainBundle.LocalizedString (key, "", "");
+		}
 	}
 }
