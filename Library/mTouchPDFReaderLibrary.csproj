@@ -37,7 +37,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.4.9.4\lib\netstandard2.0\Autofac.dll</HintPath>
+      <HintPath>..\packages\Autofac.5.1.2\lib\netstandard2.1\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
