@@ -270,6 +270,18 @@
             <param name="serviceKey">Key to associate with the component.</param>
             <returns>A registration builder allowing further configuration of the component.</returns>
         </member>
+        <member name="M:Autofac.Builder.IRegistrationBuilder`3.InstancePerOwned``1(System.Object[])">
+            <summary>
+            Configure the component so that every dependent component or call to Resolve()
+            within a ILifetimeScope created by an owned instance gets the same, shared instance.
+            Dependent components in lifetime scopes that are children of the owned instance scope will
+            share the parent's instance. If no appropriate owned instance scope can be found in the
+            hierarchy an <see cref="T:Autofac.Core.DependencyResolutionException"/> is thrown.
+            </summary>
+            <typeparam name="TService">The service type provided by the component.</typeparam>
+            <param name="serviceKeys">Keys to associate with the component.</param>
+            <returns>A registration builder allowing further configuration of the component.</returns>
+        </member>
         <member name="M:Autofac.Builder.IRegistrationBuilder`3.InstancePerOwned(System.Object,System.Type)">
             <summary>
             Configure the component so that every dependent component or call to Resolve()
@@ -680,6 +692,9 @@
             <typeparam name="TService">The service type provided by the component.</typeparam>
             <param name="serviceKey">Key to associate with the component.</param>
             <returns>A registration builder allowing further configuration of the component.</returns>
+        </member>
+        <member name="M:Autofac.Builder.RegistrationBuilder`3.InstancePerOwned``1(System.Object[])">
+            <inheritdoc />
         </member>
         <member name="M:Autofac.Builder.RegistrationBuilder`3.InstancePerOwned(System.Object,System.Type)">
             <summary>
@@ -2589,11 +2604,37 @@
             <param name="value">The instance that has the specified key.</param>
             <returns><c>true</c> if the key was found; otherwise, <c>false</c>.</returns>
         </member>
+        <member name="M:Autofac.Core.ISharingLifetimeScope.TryGetSharedInstance(System.Guid,System.Nullable{System.Guid},System.Object@)">
+            <summary>
+            Try to retrieve a shared instance based on a primary GUID key and
+            possible secondary qualifying GUID key.
+            </summary>
+            <param name="primaryId">Key to look up.</param>
+            <param name="qualifyingId">
+            Secondary key to look up, to better identify an instance that wraps around another instance
+            or is otherwise "namespaced" by it.
+            </param>
+            <param name="value">The instance that has the specified keys.</param>
+            <returns><c>true</c> if the key was found; otherwise, <c>false</c>.</returns>
+        </member>
         <member name="M:Autofac.Core.ISharingLifetimeScope.CreateSharedInstance(System.Guid,System.Func{System.Object})">
             <summary>
             Creates a shared instance with a GUID key.
             </summary>
             <param name="id">Key.</param>
+            <param name="creator">A function that will create the instance when called.</param>
+            <returns>The shared instance.</returns>
+        </member>
+        <member name="M:Autofac.Core.ISharingLifetimeScope.CreateSharedInstance(System.Guid,System.Nullable{System.Guid},System.Func{System.Object})">
+            <summary>
+            Creates a shared instance with a primary GUID key and
+            possible secondary qualifying GUID key.
+            </summary>
+            <param name="primaryId">Key.</param>
+            <param name="qualifyingId">
+            Secondary key, to better identify an instance that wraps around another instance
+            or is otherwise "namespaced" by it.
+            </param>
             <param name="creator">A function that will create the instance when called.</param>
             <returns>The shared instance.</returns>
         </member>
@@ -2796,8 +2837,14 @@
         <member name="M:Autofac.Core.Lifetime.LifetimeScope.CreateSharedInstance(System.Guid,System.Func{System.Object})">
             <inheritdoc />
         </member>
+        <member name="M:Autofac.Core.Lifetime.LifetimeScope.CreateSharedInstance(System.Guid,System.Nullable{System.Guid},System.Func{System.Object})">
+            <inheritdoc/>
+        </member>
         <member name="M:Autofac.Core.Lifetime.LifetimeScope.TryGetSharedInstance(System.Guid,System.Object@)">
             <inheritdoc />
+        </member>
+        <member name="M:Autofac.Core.Lifetime.LifetimeScope.TryGetSharedInstance(System.Guid,System.Nullable{System.Guid},System.Object@)">
+            <inheritdoc/>
         </member>
         <member name="P:Autofac.Core.Lifetime.LifetimeScope.Disposer">
             <summary>
@@ -5435,6 +5482,12 @@
         <member name="M:Autofac.Features.OwnedInstances.Owned`1.Dispose(System.Boolean)">
             <summary>
             Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="M:Autofac.Features.OwnedInstances.Owned`1.DisposeAsync(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources asynchronously.
             </summary>
             <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         </member>
