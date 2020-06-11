@@ -37,7 +37,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.5.1.2\lib\netstandard2.1\Autofac.dll</HintPath>
+      <HintPath>..\packages\Autofac.5.2.0\lib\netstandard2.1\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
@@ -78,7 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="en.lproj\Localizable.strings" />
-    <Content Include="ru.lproj\Localizable.strings" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\navigateToFirst.png" />
