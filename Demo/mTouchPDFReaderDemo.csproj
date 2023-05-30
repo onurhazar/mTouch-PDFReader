@@ -43,7 +43,6 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <DebugSymbols>true</DebugSymbols>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
@@ -53,7 +52,6 @@
     <CodesignKey>iPhone Distribution</CodesignKey>
     <DebugSymbols>true</DebugSymbols>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
@@ -62,7 +60,6 @@
     <CodesignProvision>Automatic:AppStore</CodesignProvision>
     <DebugSymbols>true</DebugSymbols>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
