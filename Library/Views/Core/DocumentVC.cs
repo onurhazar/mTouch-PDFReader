@@ -101,7 +101,7 @@ namespace mTouchPDFReader.Library.Views.Core
 				UIPageViewControllerSpineLocation.Min);
 			_bookPageViewController.View.Frame = getBookViewFrameRect ();
 			_bookPageViewController.View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-			_bookPageViewController.View.BackgroundColor = UIColor.GroupTableViewBackgroundColor;
+			_bookPageViewController.View.BackgroundColor = UIColor.GroupTableViewBackground;
 			_bookPageViewController.GetNextViewController = getNextPageViewController;
 			_bookPageViewController.GetPreviousViewController = getPreviousPageViewController;
 			_bookPageViewController.GetSpineLocation = getSpineLocation;

@@ -161,7 +161,7 @@ namespace mTouchPDFReader.Library.Views.Core
 
 		private void updateMinimumMaximumZoom ()
 		{
-			CGRect targetRect = RectangleFExtensions.Inset (Bounds, ContentViewPadding, ContentViewPadding);
+			CGRect targetRect = CGRectExtensions.Inset (Bounds, ContentViewPadding, ContentViewPadding);
 			float zoomScale = getZoomScaleThatFits (targetRect.Size, _pageContentView.Bounds.Size);
 			MinimumZoomScale = zoomScale;
 			MaximumZoomScale = zoomScale * MgrAccessor.SettingsMgr.Settings.ZoomScaleLevels;

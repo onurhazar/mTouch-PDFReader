@@ -32,7 +32,7 @@ namespace mTouchPDFReader.Library.Managers
 	{
 		public static string t (this string key)
 		{
-			return NSBundle.MainBundle.LocalizedString (key, "", "");
+			return NSBundle.MainBundle.GetLocalizedString (key, "", "");
 		}
 	}
 }

@@ -1,6 +1,6 @@
 
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mTouchPDFReaderLibrary", "Library\mTouchPDFReaderLibrary.csproj", "{9DAD0158-D923-48BF-BC35-1014C00B7C95}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mTouchPDFReaderDemo", "Demo\mTouchPDFReaderDemo.csproj", "{107BAA2B-C5E7-4E8D-B497-173A12D5CB54}"
@@ -44,36 +44,26 @@ Global
 		StartupItem = Demo\mTouchPDFReaderDemo.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
-		$1.DirectoryNamespaceAssociation = None
 		$1.ResourceNamePolicy = FileName
 		$0.TextStylePolicy = $2
-		$2.TabWidth = 4
-		$2.inheritsSet = Mono
-		$2.inheritsScope = text/plain
 		$2.scope = application/vnd.apple-interface-builder
+		$2.FileWidth = 80
+		$2.IndentWidth = 8
 		$0.XmlFormattingPolicy = $3
-		$3.inheritsSet = Mono
-		$3.inheritsScope = application/xml
 		$3.scope = application/vnd.apple-interface-builder
 		$0.TextStylePolicy = $4
-		$4.TabWidth = 4
-		$4.inheritsSet = Mono
-		$4.inheritsScope = text/plain
 		$4.scope = application/xml
+		$4.FileWidth = 80
+		$4.IndentWidth = 8
 		$0.XmlFormattingPolicy = $5
-		$5.inheritsSet = Mono
-		$5.inheritsScope = application/xml
 		$5.scope = application/xml
 		$0.TextStylePolicy = $6
-		$6.TabWidth = 4
-		$6.inheritsSet = Mono
-		$6.inheritsScope = text/plain
 		$6.scope = text/plain
+		$6.FileWidth = 80
+		$6.IndentWidth = 8
 		$0.TextStylePolicy = $7
-		$7.TabsToSpaces = False
-		$7.inheritsSet = VisualStudio
-		$7.inheritsScope = text/plain
 		$7.scope = text/x-csharp
+		$7.FileWidth = 80
 		$0.CSharpFormattingPolicy = $8
 		$8.IndentSwitchBody = True
 		$8.AllowEventAddBlockInline = False
@@ -87,17 +77,30 @@ Global
 		$8.NewParentheses = False
 		$8.BlankLinesBeforeUsings = 1
 		$8.BlankLinesBeforeFirstDeclaration = 1
-		$8.inheritsSet = Mono
-		$8.inheritsScope = text/x-csharp
 		$8.scope = text/x-csharp
+		$8.IndentSwitchSection = False
+		$8.NewLinesForBracesInProperties = False
+		$8.NewLinesForBracesInAccessors = False
+		$8.NewLinesForBracesInAnonymousMethods = False
+		$8.NewLinesForBracesInControlBlocks = False
+		$8.NewLinesForBracesInAnonymousTypes = False
+		$8.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$8.NewLinesForBracesInLambdaExpressionBody = False
+		$8.NewLineForElse = False
+		$8.NewLineForCatch = False
+		$8.NewLineForFinally = False
+		$8.NewLineForMembersInObjectInit = False
+		$8.NewLineForMembersInAnonymousTypes = False
+		$8.NewLineForClausesInQuery = False
+		$8.SpacingAfterMethodDeclarationName = True
+		$8.SpaceAfterMethodCallName = True
+		$8.SpaceBeforeOpenSquareBracket = True
 		$0.TextStylePolicy = $9
-		$9.TabWidth = 4
-		$9.inheritsSet = Mono
-		$9.inheritsScope = text/plain
 		$9.scope = text/x-apple-strings
+		$9.FileWidth = 80
+		$9.IndentWidth = 8
 		$0.StandardHeader = $10
 		$10.Text = @  ${FileName}\n \n Author:\n      ${AuthorName} <${AuthorEmail}>\n\n Copyright (c) ${Year} ${CopyrightHolder}\n\n This program is free software: you can redistribute it and/or modify\n it under the terms of the GNU General Public License as published by\n the Free Software Foundation, either version 3 of the License, or\n (at your option) any later version.\n\n This program is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU General Public License for more details.\n\n You should have received a copy of the GNU General Public License\n along with this program.  If not, see <http://www.gnu.org/licenses/>.
-		$10.IncludeInNewFiles = True
 		$0.NameConventionPolicy = $11
 		$11.Rules = $12
 		$12.NamingRule = $13
